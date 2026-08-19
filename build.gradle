@@ -1,0 +1,77 @@
+plugins {
+	id 'java'
+}
+
+repositories {
+	maven {
+		url = 'https://repo.runelite.net'
+		content {
+			includeGroupByRegex("net\\.runelite.*")
+		}
+	}
+	mavenCentral()
+}
+
+def runeLiteVersion = 'latest.release'
+
+dependencies {
+	compileOnly group: 'net.runelite', name: 'client', version: runeLiteVersion
+	compileOnly group: 'org.jetbrains', name: 'annotations', version: '24.1.0'
+	runtimeOnly group: 'net.runelite', name: 'client', version: runeLiteVersion
+	testImplementation group: 'net.runelite', name: 'client', version: runeLiteVersion
+	testImplementation group: 'junit', name: 'junit', version: '4.13.2'
+	testCompileOnly group: 'org.jetbrains', name: 'annotations', version: '24.1.0'
+}
+
+tasks.withType(JavaCompile).configureEach {
+	options.encoding = 'UTF-8'
+	options.release.set(11)
+	options.compilerArgs << '-Xlint:all' << '-Werror'
+}
+
+tasks.named('jar') {
+	exclude 'net/runelite/client/plugins/hotreload/**'
+}
+
+def hotreloadJar = tasks.register('hotreloadJar', Jar) {
+	archiveFileName.set('hotreload.jar')
+	from sourceSets.main.output
+	include 'net/runelite/client/plugins/hotreload/**'
+}
+
+tasks.named('assemble') {
+	dependsOn hotreloadJar
+}
+
+tasks.register('blastFurnaceSelfTest', JavaExec) {
+	classpath = sourceSets.test.runtimeClasspath
+	mainClass = 'net.runelite.client.plugins.m8aq.api.smithing.BlastFurnaceSelfTest'
+	jvmArgs '-ea'
+}
+
+tasks.register('stateReaderSelfTest', JavaExec) {
+	classpath = sourceSets.test.runtimeClasspath
+	mainClass = 'net.runelite.client.plugins.stateinspector.StateReaderSelfTest'
+	jvmArgs '-ea'
+}
+
+tasks.register('smithingStationsSelfTest', JavaExec) {
+	classpath = sourceSets.test.runtimeClasspath
+	mainClass = 'net.runelite.client.plugins.m8aq.api.smithing.SmithingStationsSelfTest'
+	jvmArgs '-ea'
+}
+
+tasks.register('run', JavaExec) {
+	dependsOn hotreloadJar
+	classpath = files(hotreloadJar) + configurations.runtimeClasspath
+	mainClass = 'net.runelite.client.plugins.hotreload.Launcher'
+	jvmArgs '-ea'
+	systemProperty 'hotreload.projectdir', projectDir.absolutePath
+	if (project.hasProperty('devJar')) {
+		systemProperty 'hotreload.devjar', file(project.property('devJar')).absolutePath
+	}
+}
+
+tasks.named('check') {
+	dependsOn 'blastFurnaceSelfTest', 'smithingStationsSelfTest', 'stateReaderSelfTest'
+}
