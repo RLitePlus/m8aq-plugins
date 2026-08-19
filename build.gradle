@@ -49,6 +49,12 @@ tasks.register('blastFurnaceSelfTest', JavaExec) {
 	jvmArgs '-ea'
 }
 
+tasks.register('giantsFoundrySelfTest', JavaExec) {
+	classpath = sourceSets.test.runtimeClasspath
+	mainClass = 'net.runelite.client.plugins.m8aq.api.smithing.GiantsFoundrySelfTest'
+	jvmArgs '-ea'
+}
+
 tasks.register('stateReaderSelfTest', JavaExec) {
 	classpath = sourceSets.test.runtimeClasspath
 	mainClass = 'net.runelite.client.plugins.stateinspector.StateReaderSelfTest'
@@ -73,5 +79,6 @@ tasks.register('run', JavaExec) {
 }
 
 tasks.named('check') {
-	dependsOn 'blastFurnaceSelfTest', 'smithingStationsSelfTest', 'stateReaderSelfTest'
+	dependsOn 'blastFurnaceSelfTest', 'giantsFoundrySelfTest',
+		'smithingStationsSelfTest', 'stateReaderSelfTest'
 }
