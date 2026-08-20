@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.stateinspector;
+package net.runelite.client.plugins.m8aq.stateinspector;
 
 import com.google.common.reflect.ClassPath;
 import java.awt.BasicStroke;

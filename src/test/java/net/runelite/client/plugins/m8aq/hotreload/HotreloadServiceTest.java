@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.hotreload;
+package net.runelite.client.plugins.m8aq.hotreload;
 
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;

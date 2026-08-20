@@ -30,13 +30,13 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 tasks.named('jar') {
-	exclude 'net/runelite/client/plugins/hotreload/**'
+	exclude 'net/runelite/client/plugins/m8aq/hotreload/**'
 }
 
 def hotreloadJar = tasks.register('hotreloadJar', Jar) {
 	archiveFileName.set('hotreload.jar')
 	from sourceSets.main.output
-	include 'net/runelite/client/plugins/hotreload/**'
+	include 'net/runelite/client/plugins/m8aq/hotreload/**'
 }
 
 tasks.named('assemble') {
@@ -63,7 +63,7 @@ tasks.register('guardiansOfTheRiftSelfTest', JavaExec) {
 
 tasks.register('stateReaderSelfTest', JavaExec) {
 	classpath = sourceSets.test.runtimeClasspath
-	mainClass = 'net.runelite.client.plugins.stateinspector.StateReaderSelfTest'
+	mainClass = 'net.runelite.client.plugins.m8aq.stateinspector.StateReaderSelfTest'
 	jvmArgs '-ea'
 }
 
@@ -76,7 +76,7 @@ tasks.register('smithingStationsSelfTest', JavaExec) {
 tasks.register('run', JavaExec) {
 	dependsOn hotreloadJar
 	classpath = files(hotreloadJar) + configurations.runtimeClasspath
-	mainClass = 'net.runelite.client.plugins.hotreload.Launcher'
+	mainClass = 'net.runelite.client.plugins.m8aq.hotreload.Launcher'
 	jvmArgs '-ea'
 	systemProperty 'hotreload.projectdir', projectDir.absolutePath
 	if (project.hasProperty('devJar')) {

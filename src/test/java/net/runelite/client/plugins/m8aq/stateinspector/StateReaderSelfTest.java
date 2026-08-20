@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.stateinspector;
+package net.runelite.client.plugins.m8aq.stateinspector;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,7 +20,8 @@ public final class StateReaderSelfTest
 	/** Runs the checks with Java assertions enabled. */
 	public static void main(String[] args) throws Exception
 	{
-		assert StateInspectorPlugin.class.getPackageName().equals("net.runelite.client.plugins.stateinspector");
+		assert StateInspectorPlugin.class.getPackageName().equals(
+			"net.runelite.client.plugins.m8aq.stateinspector");
 		List<Class<?>> discovered = StateInspectorPlugin.discoverApiClasses(
 			StateInspectorPlugin.class.getClassLoader());
 		assert discovered.containsAll(Arrays.asList(Anvil.class, BlastFurnace.class, Furnace.class));

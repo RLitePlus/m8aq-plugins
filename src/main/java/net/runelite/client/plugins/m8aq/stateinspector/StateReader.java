@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.stateinspector;
+package net.runelite.client.plugins.m8aq.stateinspector;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

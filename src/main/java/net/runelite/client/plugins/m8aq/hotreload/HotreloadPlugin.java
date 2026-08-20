@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.hotreload;
+package net.runelite.client.plugins.m8aq.hotreload;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;

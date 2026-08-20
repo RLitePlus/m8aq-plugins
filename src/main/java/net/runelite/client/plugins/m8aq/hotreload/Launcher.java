@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.hotreload;
+package net.runelite.client.plugins.m8aq.hotreload;
 
 import java.io.IOException;
 import java.nio.file.Files;
