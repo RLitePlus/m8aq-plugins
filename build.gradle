@@ -55,6 +55,12 @@ tasks.register('giantsFoundrySelfTest', JavaExec) {
 	jvmArgs '-ea'
 }
 
+tasks.register('essencePouchesSelfTest', JavaExec) {
+	classpath = sourceSets.test.runtimeClasspath
+	mainClass = 'net.runelite.client.plugins.m8aq.api.misc.EssencePouchesSelfTest'
+	jvmArgs '-ea'
+}
+
 tasks.register('guardiansOfTheRiftSelfTest', JavaExec) {
 	classpath = sourceSets.test.runtimeClasspath
 	mainClass = 'net.runelite.client.plugins.m8aq.api.runecrafting.GuardiansOfTheRiftSelfTest'
@@ -85,6 +91,6 @@ tasks.register('run', JavaExec) {
 }
 
 tasks.named('check') {
-	dependsOn 'blastFurnaceSelfTest', 'giantsFoundrySelfTest',
+	dependsOn 'blastFurnaceSelfTest', 'essencePouchesSelfTest', 'giantsFoundrySelfTest',
 		'guardiansOfTheRiftSelfTest', 'smithingStationsSelfTest', 'stateReaderSelfTest'
 }
