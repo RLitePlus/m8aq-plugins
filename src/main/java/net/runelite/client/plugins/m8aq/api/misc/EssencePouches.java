@@ -5,6 +5,7 @@ import java.util.EnumMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.ToIntFunction;
+import lombok.Getter;
 import net.runelite.api.Client;
 import net.runelite.api.ItemContainer;
 import net.runelite.api.Skill;
@@ -54,7 +55,11 @@ public final class EssencePouches
 		ASTRAL_CONTACT(false, 0),
 		APPRENTICE_CORDELIA(true, 1);
 
+		/** @return whether this route requires visiting the Temple of the Eye, not an active round */
+		@Getter
 		private final boolean templeOfTheEyeOnly;
+		/** @return abyssal pearls consumed per repair */
+		@Getter
 		private final int abyssalPearlCost;
 
 		RepairMethod(boolean templeOfTheEyeOnly, int abyssalPearlCost)
@@ -63,17 +68,6 @@ public final class EssencePouches
 			this.abyssalPearlCost = abyssalPearlCost;
 		}
 
-		/** @return whether this route requires visiting the Temple of the Eye, not an active round */
-		public boolean isTempleOfTheEyeOnly()
-		{
-			return templeOfTheEyeOnly;
-		}
-
-		/** @return abyssal pearls consumed per repair */
-		public int getAbyssalPearlCost()
-		{
-			return abyssalPearlCost;
-		}
 	}
 
 	/** Essence-pouch size and client values. */
@@ -199,12 +193,26 @@ public final class EssencePouches
 	/** Immutable state for one pouch size. */
 	public static final class PouchState
 	{
+		/** @return pouch size */
+		@Getter
 		private final Pouch pouch;
+		/** @return essence currently stored in the pouch */
+		@Getter
 		private final int storedEssence;
+		/** @return capacity at the current degradation and Runecraft level */
+		@Getter
 		private final int capacity;
+		/** @return capacity with no degradation at the current Runecraft level */
+		@Getter
 		private final int maximumCapacity;
+		/** @return raw degradation counter; this is not a remaining-use count */
+		@Getter
 		private final int degradation;
+		/** @return whether this pouch size is currently visible in inventory */
+		@Getter
 		private final boolean inInventory;
+		/** @return whether the inventory item is the visibly degraded variant */
+		@Getter
 		private final boolean visiblyDegradedInInventory;
 
 		private PouchState(
@@ -225,61 +233,41 @@ public final class EssencePouches
 			this.visiblyDegradedInInventory = visiblyDegradedInInventory;
 		}
 
-		/** @return pouch size */
-		public Pouch getPouch()
-		{
-			return pouch;
-		}
-
-		/** @return essence currently stored in the pouch */
-		public int getStoredEssence()
-		{
-			return storedEssence;
-		}
-
-		/** @return capacity at the current degradation and Runecraft level */
-		public int getCapacity()
-		{
-			return capacity;
-		}
-
-		/** @return capacity with no degradation at the current Runecraft level */
-		public int getMaximumCapacity()
-		{
-			return maximumCapacity;
-		}
-
-		/** @return raw degradation counter; this is not a remaining-use count */
-		public int getDegradation()
-		{
-			return degradation;
-		}
-
-		/** @return whether this pouch size is currently visible in inventory */
-		public boolean isInInventory()
-		{
-			return inInventory;
-		}
-
-		/** @return whether the inventory item is the visibly degraded variant */
-		public boolean isVisiblyDegradedInInventory()
-		{
-			return visiblyDegradedInInventory;
-		}
-
 		/** @return whether any accumulated degradation can be repaired */
 		public boolean needsRepair()
 		{
 			return degradation > 0;
+		}
+
+		@Override
+		public String toString()
+		{
+			return "{storedEssence=" + storedEssence
+				+ ", capacity=" + capacity
+				+ ", maximumCapacity=" + maximumCapacity
+				+ ", degradation=" + degradation
+				+ ", inInventory=" + inInventory
+				+ ", visiblyDegraded=" + visiblyDegradedInInventory
+				+ ", needsRepair=" + needsRepair() + "}";
 		}
 	}
 
 	/** Immutable aggregate essence-pouch state captured from one client read. */
 	public static final class State
 	{
+		/** @return immutable state for every pouch size */
+		@Getter
 		private final Map<Pouch, PouchState> pouches;
+		/** @return whether Cordelia's 25-pearl repair unlock has been purchased */
+		@Getter
 		private final boolean cordeliaRepairUnlocked;
+		/** @return abyssal pearls currently in inventory */
+		@Getter
 		private final int abyssalPearls;
+		/**
+		 * @return whether a redwood-lit lantern is currently preventing degradation in GOTR
+		 */
+		@Getter
 		private final boolean gotrDecayProtectionActive;
 
 		private State(
@@ -292,12 +280,6 @@ public final class EssencePouches
 			this.cordeliaRepairUnlocked = cordeliaRepairUnlocked;
 			this.abyssalPearls = abyssalPearls;
 			this.gotrDecayProtectionActive = gotrDecayProtectionActive;
-		}
-
-		/** @return immutable state for every pouch size */
-		public Map<Pouch, PouchState> getPouches()
-		{
-			return pouches;
 		}
 
 		/**
@@ -324,18 +306,6 @@ public final class EssencePouches
 			return false;
 		}
 
-		/** @return whether Cordelia's 25-pearl repair unlock has been purchased */
-		public boolean isCordeliaRepairUnlocked()
-		{
-			return cordeliaRepairUnlocked;
-		}
-
-		/** @return abyssal pearls currently in inventory */
-		public int getAbyssalPearls()
-		{
-			return abyssalPearls;
-		}
-
 		/** @return whether the player has unlocked and can pay for Cordelia's next repair */
 		public boolean canPayForCordeliaRepair()
 		{
@@ -343,12 +313,5 @@ public final class EssencePouches
 				&& abyssalPearls >= RepairMethod.APPRENTICE_CORDELIA.getAbyssalPearlCost();
 		}
 
-		/**
-		 * @return whether a redwood-lit lantern is currently preventing degradation in GOTR
-		 */
-		public boolean isGotrDecayProtectionActive()
-		{
-			return gotrDecayProtectionActive;
-		}
 	}
 }

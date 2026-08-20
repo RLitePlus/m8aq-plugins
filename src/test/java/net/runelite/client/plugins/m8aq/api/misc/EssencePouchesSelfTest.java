@@ -53,6 +53,9 @@ public final class EssencePouchesSelfTest
 		assert state.getPouch(EssencePouches.Pouch.GIANT).getCapacity() == 3;
 		assert state.getPouch(EssencePouches.Pouch.COLOSSAL).getMaximumCapacity() == 27;
 		assert state.getPouch(EssencePouches.Pouch.COLOSSAL).getCapacity() == 20;
+		assert state.getPouch(EssencePouches.Pouch.COLOSSAL).toString().equals(
+			"{storedEssence=20, capacity=20, maximumCapacity=27, degradation=565, "
+				+ "inInventory=true, visiblyDegraded=true, needsRepair=true}");
 		assert state.getPouch(EssencePouches.Pouch.MEDIUM).isVisiblyDegradedInInventory();
 		assert !state.getPouch(EssencePouches.Pouch.LARGE).isInInventory();
 		assert state.needsRepair();
@@ -60,6 +63,19 @@ public final class EssencePouchesSelfTest
 		assert state.getAbyssalPearls() == 2;
 		assert state.canPayForCordeliaRepair();
 		assert state.isGotrDecayProtectionActive();
+
+		varbits.put(VarbitID.GOTR_CORDELIA_REPAIR_POUCH, 0);
+		state = EssencePouches.getState(client(varbits, varps, inventory, equipment, 75));
+		assert state.getAbyssalPearls() == 2;
+		assert !state.isCordeliaRepairUnlocked();
+		assert !state.canPayForCordeliaRepair();
+
+		varbits.put(VarbitID.GOTR_CORDELIA_REPAIR_POUCH, 1);
+		inventory.remove(ItemID.ABYSSAL_PEARL);
+		state = EssencePouches.getState(client(varbits, varps, inventory, equipment, 75));
+		assert state.isCordeliaRepairUnlocked();
+		assert state.getAbyssalPearls() == 0;
+		assert !state.canPayForCordeliaRepair();
 		assert EssencePouches.RepairMethod.APPRENTICE_CORDELIA.isTempleOfTheEyeOnly();
 		assert !EssencePouches.RepairMethod.DARK_MAGE.isTempleOfTheEyeOnly();
 		assert !EssencePouches.RepairMethod.ASTRAL_CONTACT.isTempleOfTheEyeOnly();

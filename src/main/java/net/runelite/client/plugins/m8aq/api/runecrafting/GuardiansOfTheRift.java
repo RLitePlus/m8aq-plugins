@@ -9,11 +9,13 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.Set;
+import lombok.Getter;
 import net.runelite.api.Client;
 import net.runelite.api.CollisionData;
 import net.runelite.api.CollisionDataFlag;
 import net.runelite.api.GameObject;
 import net.runelite.api.GroundObject;
+import net.runelite.api.Item;
 import net.runelite.api.ItemContainer;
 import net.runelite.api.Player;
 import net.runelite.api.Point;
@@ -398,17 +400,13 @@ public final class GuardiansOfTheRift
 		STRONG(ItemID.GOTR_CELL_TIER3),
 		OVERCHARGED(ItemID.GOTR_CELL_TIER4);
 
+		/** @return charged-cell item ID, or {@code -1} for {@link #NONE} */
+		@Getter
 		private final int itemId;
 
 		CellTier(int itemId)
 		{
 			this.itemId = itemId;
-		}
-
-		/** @return charged-cell item ID, or {@code -1} for {@link #NONE} */
-		public int getItemId()
-		{
-			return itemId;
 		}
 
 		private static CellTier fromInventory(ItemContainer inventory)
@@ -439,8 +437,14 @@ public final class GuardiansOfTheRift
 		STRONG(43742, false, false, true),
 		OVERCHARGED(43743, false, false, true);
 
+		/** @return cell-tile ground-object ID */
+		@Getter
 		private final int objectId;
+		/** @return whether the barrier is broken */
+		@Getter
 		private final boolean broken;
+		/** @return whether the cell tile currently offers the Repair interaction */
+		@Getter
 		private final boolean repairable;
 		private final boolean acceptsCell;
 
@@ -450,24 +454,6 @@ public final class GuardiansOfTheRift
 			this.broken = broken;
 			this.repairable = repairable;
 			this.acceptsCell = acceptsCell;
-		}
-
-		/** @return cell-tile ground-object ID */
-		public int getObjectId()
-		{
-			return objectId;
-		}
-
-		/** @return whether the barrier is broken */
-		public boolean isBroken()
-		{
-			return broken;
-		}
-
-		/** @return whether the cell tile currently offers the Repair interaction */
-		public boolean isRepairable()
-		{
-			return repairable;
 		}
 
 		/** @return whether the cell tile currently offers the Place-cell interaction */
@@ -492,25 +478,17 @@ public final class GuardiansOfTheRift
 	/** Immutable state for one currently loaded barrier cell tile. */
 	public static final class Barrier
 	{
+		/** @return barrier cell-tile location */
+		@Getter
 		private final WorldPoint location;
+		/** @return client-visible barrier state */
+		@Getter
 		private final BarrierState state;
 
 		private Barrier(WorldPoint location, BarrierState state)
 		{
 			this.location = location;
 			this.state = state;
-		}
-
-		/** @return barrier cell-tile location */
-		public WorldPoint getLocation()
-		{
-			return location;
-		}
-
-		/** @return client-visible barrier state */
-		public BarrierState getState()
-		{
-			return state;
 		}
 
 		@Override
@@ -544,16 +522,38 @@ public final class GuardiansOfTheRift
 	/** Immutable GOTR-relevant inventory state. */
 	public static final class InventoryState
 	{
+		/** @return guardian fragments in inventory */
+		@Getter
 		private final int guardianFragments;
+		/** @return guardian essence in inventory, excluding essence pouches */
+		@Getter
 		private final int guardianEssence;
+		/** @return uncharged cells in inventory */
+		@Getter
 		private final int unchargedCells;
+		/** @return charged-cell tier, or {@link CellTier#NONE} */
+		@Getter
 		private final CellTier chargedCellTier;
+		/** @return catalytic guardian stones in inventory */
+		@Getter
 		private final int catalyticGuardianStones;
+		/** @return elemental guardian stones in inventory */
+		@Getter
 		private final int elementalGuardianStones;
+		/** @return polyelemental guardian stones in inventory */
+		@Getter
 		private final int polyelementalGuardianStones;
+		/** @return polycatalytic guardian stones in inventory */
+		@Getter
 		private final int polycatalyticGuardianStones;
+		/** @return immutable portal-talisman counts keyed by altar */
+		@Getter
 		private final Map<Altar, Integer> portalTalismans;
+		/** @return whether a chisel is in inventory */
+		@Getter
 		private final boolean chiselPresent;
+		/** @return currently empty inventory slots, or zero when inventory is unavailable */
+		@Getter
 		private final int emptySlots;
 
 		private InventoryState(
@@ -604,66 +604,25 @@ public final class GuardiansOfTheRift
 				count(inventory, ItemID.GOTR_GUARDIAN_STONE_POLYCATALYTIC),
 				talismans,
 				inventory != null && inventory.contains(ItemID.CHISEL),
-				inventory == null ? 0 : Math.max(0, inventory.size() - inventory.count()));
+				countEmptySlots(inventory));
+		}
+
+		private static int countEmptySlots(ItemContainer inventory)
+		{
+			int emptySlots = 0;
+			if (inventory != null)
+			{
+				for (Item item : inventory.getItems())
+				{
+					emptySlots += item.getId() == -1 ? 1 : 0;
+				}
+			}
+			return emptySlots;
 		}
 
 		private static int count(ItemContainer inventory, int itemId)
 		{
 			return inventory == null ? 0 : inventory.count(itemId);
-		}
-
-		/** @return guardian fragments in inventory */
-		public int getGuardianFragments()
-		{
-			return guardianFragments;
-		}
-
-		/** @return guardian essence in inventory, excluding essence pouches */
-		public int getGuardianEssence()
-		{
-			return guardianEssence;
-		}
-
-		/** @return uncharged cells in inventory */
-		public int getUnchargedCells()
-		{
-			return unchargedCells;
-		}
-
-		/** @return charged-cell tier, or {@link CellTier#NONE} */
-		public CellTier getChargedCellTier()
-		{
-			return chargedCellTier;
-		}
-
-		/** @return catalytic guardian stones in inventory */
-		public int getCatalyticGuardianStones()
-		{
-			return catalyticGuardianStones;
-		}
-
-		/** @return elemental guardian stones in inventory */
-		public int getElementalGuardianStones()
-		{
-			return elementalGuardianStones;
-		}
-
-		/** @return polyelemental guardian stones in inventory */
-		public int getPolyelementalGuardianStones()
-		{
-			return polyelementalGuardianStones;
-		}
-
-		/** @return polycatalytic guardian stones in inventory */
-		public int getPolycatalyticGuardianStones()
-		{
-			return polycatalyticGuardianStones;
-		}
-
-		/** @return immutable portal-talisman counts keyed by altar */
-		public Map<Altar, Integer> getPortalTalismans()
-		{
-			return portalTalismans;
 		}
 
 		/**
@@ -675,18 +634,6 @@ public final class GuardiansOfTheRift
 		public int getPortalTalismanCount(Altar altar)
 		{
 			return portalTalismans.getOrDefault(Objects.requireNonNull(altar, "altar"), 0);
-		}
-
-		/** @return whether a chisel is in inventory */
-		public boolean isChiselPresent()
-		{
-			return chiselPresent;
-		}
-
-		/** @return currently empty inventory slots, or zero when inventory is unavailable */
-		public int getEmptySlots()
-		{
-			return emptySlots;
 		}
 
 		@Override
@@ -722,11 +669,21 @@ public final class GuardiansOfTheRift
 		BLOOD(4364, true, 12875, 77, CellTier.OVERCHARGED, ItemID.GOTR_PORTAL_TALISMAN_BLOOD, Quest.SINS_OF_THE_FATHER);
 
 		private final int spriteId;
+		/** @return whether this is a catalytic altar */
+		@Getter
 		private final boolean catalytic;
 		private final int regionId;
+		/** @return Runecraft level required to imbue essence, or {@code -1} for unknown */
+		@Getter
 		private final int requiredRunecraftLevel;
+		/** @return charged-cell tier produced by this altar */
+		@Getter
 		private final CellTier cellTier;
+		/** @return corresponding portal-talisman item ID, or {@code -1} for unknown */
+		@Getter
 		private final int portalTalismanItemId;
+		/** @return quest required to enter this portal, or {@code null} when none */
+		@Getter
 		private final Quest requiredQuest;
 
 		Altar(
@@ -745,36 +702,6 @@ public final class GuardiansOfTheRift
 			this.cellTier = cellTier;
 			this.portalTalismanItemId = portalTalismanItemId;
 			this.requiredQuest = requiredQuest;
-		}
-
-		/** @return whether this is a catalytic altar */
-		public boolean isCatalytic()
-		{
-			return catalytic;
-		}
-
-		/** @return Runecraft level required to imbue essence, or {@code -1} for unknown */
-		public int getRequiredRunecraftLevel()
-		{
-			return requiredRunecraftLevel;
-		}
-
-		/** @return charged-cell tier produced by this altar */
-		public CellTier getCellTier()
-		{
-			return cellTier;
-		}
-
-		/** @return corresponding portal-talisman item ID, or {@code -1} for unknown */
-		public int getPortalTalismanItemId()
-		{
-			return portalTalismanItemId;
-		}
-
-		/** @return quest required to enter this portal, or {@code null} when none */
-		public Quest getRequiredQuest()
-		{
-			return requiredQuest;
 		}
 
 		private static Altar fromWidget(Widget widget, boolean catalytic)
@@ -809,24 +736,60 @@ public final class GuardiansOfTheRift
 	/** Immutable Guardians of the Rift state captured from one client read. */
 	public static final class State
 	{
+		/** @return whether the Guardians of the Rift HUD is visible, including inside rune altars */
+		@Getter
 		private final boolean hudVisible;
 		private final boolean finishedGame;
+		/** @return displayed Great Guardian power percentage, or {@code -1} when unavailable */
+		@Getter
 		private final int guardianPower;
+		/** @return seconds until the active altar pair rotates, or {@code -1} when unavailable */
+		@Getter
 		private final int altarRotationSecondsRemaining;
+		/** @return elemental energy earned in the current game */
+		@Getter
 		private final int elementalEnergy;
+		/** @return catalytic energy earned in the current game */
+		@Getter
 		private final int catalyticEnergy;
+		/** @return active elemental altar, or {@link Altar#UNKNOWN} */
+		@Getter
 		private final Altar elementalAltar;
+		/** @return active catalytic altar, or {@link Altar#UNKNOWN} */
+		@Getter
 		private final Altar catalyticAltar;
+		/** @return active rift guardians, or {@code -1} when unavailable */
+		@Getter
 		private final int activeGuardians;
+		/** @return maximum active rift guardians, or {@code -1} when unavailable */
+		@Getter
 		private final int guardianLimit;
+		/** @return whether the portal to the huge guardian remains is displayed as open */
+		@Getter
 		private final boolean guardianEssencePortalOpen;
+		/** @return displayed portal compass position, or an empty string while closed */
+		@Getter
 		private final String guardianEssencePortalPosition;
+		/** @return seconds until the huge-remains portal closes, or {@code -1} when unavailable */
+		@Getter
 		private final int guardianEssencePortalSecondsRemaining;
+		/** @return whether the player is in the main Temple of the Eye minigame region */
+		@Getter
 		private final boolean inMainTemple;
+		/** @return whether the player is north of the entry barrier in the playable arena */
+		@Getter
 		private final boolean inArena;
+		/** @return rune altar the player currently occupies, or {@link Altar#UNKNOWN} */
+		@Getter
 		private final Altar currentAltar;
+		/** @return separated east or west mining pocket occupied by the player */
+		@Getter
 		private final MiningArea miningArea;
+		/** @return immutable GOTR-relevant inventory state */
+		@Getter
 		private final InventoryState inventory;
+		/** @return immutable set of currently loaded barrier cell tiles */
+		@Getter
 		private final Set<Barrier> barriers;
 
 		private State(
@@ -871,12 +834,6 @@ public final class GuardiansOfTheRift
 			this.barriers = barriers;
 		}
 
-		/** @return whether the Guardians of the Rift HUD is visible, including inside rune altars */
-		public boolean isHudVisible()
-		{
-			return hudVisible;
-		}
-
 		/** @return whether a round is active, excluding the lobby period between rounds */
 		public boolean isRoundActive()
 		{
@@ -887,30 +844,6 @@ public final class GuardiansOfTheRift
 		public boolean hasFinishedGame()
 		{
 			return finishedGame;
-		}
-
-		/** @return displayed Great Guardian power percentage, or {@code -1} when unavailable */
-		public int getGuardianPower()
-		{
-			return guardianPower;
-		}
-
-		/** @return seconds until the active altar pair rotates, or {@code -1} when unavailable */
-		public int getAltarRotationSecondsRemaining()
-		{
-			return altarRotationSecondsRemaining;
-		}
-
-		/** @return elemental energy earned in the current game */
-		public int getElementalEnergy()
-		{
-			return elementalEnergy;
-		}
-
-		/** @return catalytic energy earned in the current game */
-		public int getCatalyticEnergy()
-		{
-			return catalyticEnergy;
 		}
 
 		/** @return total elemental and catalytic energy earned in the current game */
@@ -925,88 +858,11 @@ public final class GuardiansOfTheRift
 			return getTotalEnergy() >= REWARD_ENERGY_REQUIREMENT;
 		}
 
-		/** @return active elemental altar, or {@link Altar#UNKNOWN} */
-		public Altar getElementalAltar()
-		{
-			return elementalAltar;
-		}
-
-		/** @return active catalytic altar, or {@link Altar#UNKNOWN} */
-		public Altar getCatalyticAltar()
-		{
-			return catalyticAltar;
-		}
-
-		/** @return rune altar the player currently occupies, or {@link Altar#UNKNOWN} */
-		public Altar getCurrentAltar()
-		{
-			return currentAltar;
-		}
-
-		/** @return active rift guardians, or {@code -1} when unavailable */
-		public int getActiveGuardians()
-		{
-			return activeGuardians;
-		}
-
-		/** @return maximum active rift guardians, or {@code -1} when unavailable */
-		public int getGuardianLimit()
-		{
-			return guardianLimit;
-		}
-
-		/** @return whether the portal to the huge guardian remains is displayed as open */
-		public boolean isGuardianEssencePortalOpen()
-		{
-			return guardianEssencePortalOpen;
-		}
-
-		/** @return displayed portal compass position, or an empty string while closed */
-		public String getGuardianEssencePortalPosition()
-		{
-			return guardianEssencePortalPosition;
-		}
-
-		/** @return seconds until the huge-remains portal closes, or {@code -1} when unavailable */
-		public int getGuardianEssencePortalSecondsRemaining()
-		{
-			return guardianEssencePortalSecondsRemaining;
-		}
-
-		/** @return whether the player is in the main Temple of the Eye minigame region */
-		public boolean isInMainTemple()
-		{
-			return inMainTemple;
-		}
-
 		/** @return whether the player is south of the entry barrier in the temple lobby */
 		public boolean isInLobby()
 		{
 			return inMainTemple && !inArena;
 		}
 
-		/** @return whether the player is north of the entry barrier in the playable arena */
-		public boolean isInArena()
-		{
-			return inArena;
-		}
-
-		/** @return separated east or west mining pocket occupied by the player */
-		public MiningArea getMiningArea()
-		{
-			return miningArea;
-		}
-
-		/** @return immutable GOTR-relevant inventory state */
-		public InventoryState getInventory()
-		{
-			return inventory;
-		}
-
-		/** @return immutable set of currently loaded barrier cell tiles */
-		public Set<Barrier> getBarriers()
-		{
-			return barriers;
-		}
 	}
 }

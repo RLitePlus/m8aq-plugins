@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import javax.swing.SwingUtilities;
+import lombok.Getter;
 import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.events.ExternalPluginsChanged;
 import net.runelite.client.plugins.Plugin;
@@ -316,6 +317,7 @@ final class HotreloadService implements AutoCloseable
 	private static final class HotreloadClassLoader extends URLClassLoader
 		implements ReflectUtil.PrivateLookupableClassLoader
 	{
+		@Getter(onMethod_ = @Override)
 		private MethodHandles.Lookup lookup;
 
 		private HotreloadClassLoader(URL[] urls, ClassLoader parent)
@@ -329,12 +331,6 @@ final class HotreloadService implements AutoCloseable
 			throws ClassFormatError
 		{
 			return super.defineClass(name, bytes, offset, length);
-		}
-
-		@Override
-		public MethodHandles.Lookup getLookup()
-		{
-			return lookup;
 		}
 
 		@Override

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import lombok.Getter;
 import net.runelite.api.Client;
 import net.runelite.api.EnumComposition;
 import net.runelite.api.ItemComposition;
@@ -164,10 +165,20 @@ public final class Anvil
 	/** Immutable standard-anvil product displayed by the client. */
 	public static final class Product
 	{
+		/** @return output item ID */
+		@Getter
 		private final int itemId;
+		/** @return output item name */
+		@Getter
 		private final String name;
+		/** @return items produced per smithing action */
+		@Getter
 		private final int outputQuantity;
+		/** @return bars required per smithing action, or {@code -1} if unavailable */
+		@Getter
 		private final int requiredBars;
+		/** @return required Smithing level, or {@code -1} if unavailable */
+		@Getter
 		private final int requiredLevel;
 
 		private Product(
@@ -184,36 +195,6 @@ public final class Anvil
 			this.requiredLevel = requiredLevel;
 		}
 
-		/** @return output item ID */
-		public int getItemId()
-		{
-			return itemId;
-		}
-
-		/** @return output item name */
-		public String getName()
-		{
-			return name;
-		}
-
-		/** @return items produced per smithing action */
-		public int getOutputQuantity()
-		{
-			return outputQuantity;
-		}
-
-		/** @return bars required per smithing action, or {@code -1} if unavailable */
-		public int getRequiredBars()
-		{
-			return requiredBars;
-		}
-
-		/** @return required Smithing level, or {@code -1} if unavailable */
-		public int getRequiredLevel()
-		{
-			return requiredLevel;
-		}
-
 		@Override
 		public String toString()
 		{
@@ -225,11 +206,25 @@ public final class Anvil
 	/** Immutable standard-anvil state captured from one client read. */
 	public static final class State
 	{
+		/** @return whether the standard anvil interface is visible */
+		@Getter
 		private final boolean open;
+		/** @return whether the local player is performing a standard smithing animation */
+		@Getter
 		private final boolean smithing;
+		/** @return displayed bar, or {@link Bar#UNKNOWN} while closed or unrecognised */
+		@Getter
 		private final Bar selectedBar;
+		/** @return selected bars in inventory, or zero while closed */
+		@Getter
 		private final int selectedBarCount;
+		/**
+		 * @return requested Make-X quantity, or zero while closed; 28 may also mean All
+		 */
+		@Getter
 		private final int requestedQuantity;
+		/** @return immutable list of products currently displayed */
+		@Getter
 		private final List<Product> displayedProducts;
 
 		private State(
@@ -248,42 +243,5 @@ public final class Anvil
 			this.displayedProducts = displayedProducts;
 		}
 
-		/** @return whether the standard anvil interface is visible */
-		public boolean isOpen()
-		{
-			return open;
-		}
-
-		/** @return whether the local player is performing a standard smithing animation */
-		public boolean isSmithing()
-		{
-			return smithing;
-		}
-
-		/** @return displayed bar, or {@link Bar#UNKNOWN} while closed or unrecognised */
-		public Bar getSelectedBar()
-		{
-			return selectedBar;
-		}
-
-		/** @return selected bars in inventory, or zero while closed */
-		public int getSelectedBarCount()
-		{
-			return selectedBarCount;
-		}
-
-		/**
-		 * @return requested Make-X quantity, or zero while closed; 28 may also mean All
-		 */
-		public int getRequestedQuantity()
-		{
-			return requestedQuantity;
-		}
-
-		/** @return immutable list of products currently displayed */
-		public List<Product> getDisplayedProducts()
-		{
-			return displayedProducts;
-		}
 	}
 }

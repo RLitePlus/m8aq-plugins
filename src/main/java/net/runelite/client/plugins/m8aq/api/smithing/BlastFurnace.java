@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.Objects;
+import lombok.Getter;
 import net.runelite.api.Client;
 import net.runelite.api.ItemContainer;
 import net.runelite.api.Player;
@@ -81,21 +82,17 @@ public final class BlastFurnace
 		HOT(2),
 		COOLED(3);
 
-		private final int value;
-
-		DispenserState(int value)
-		{
-			this.value = value;
-		}
-
 		/**
 		 * Returns the raw varbit value represented by this state.
 		 *
 		 * @return raw dispenser value, or {@code -1} for {@link #UNKNOWN}
 		 */
-		public int getValue()
+		@Getter
+		private final int value;
+
+		DispenserState(int value)
 		{
-			return value;
+			this.value = value;
 		}
 
 		private static DispenserState fromValue(int value)
@@ -162,11 +159,23 @@ public final class BlastFurnace
 	/** Immutable Blast Furnace state captured from one client read. */
 	public static final class State
 	{
+		/** @return current dispenser state */
+		@Getter
 		private final DispenserState dispenserState;
+		/** @return coffer balance in coins */
+		@Getter
 		private final int cofferCoins;
+		/** @return immutable map containing nonzero stored-material counts */
+		@Getter
 		private final Map<Material, Integer> materials;
+		/** @return immutable map containing nonzero stored-bar counts */
+		@Getter
 		private final Map<Bar, Integer> bars;
+		/** @return whether ice-capable gloves are currently equipped */
+		@Getter
 		private final boolean coolingGlovesEquipped;
+		/** @return whether the local player is in the Blast Furnace region */
+		@Getter
 		private final boolean atBlastFurnace;
 
 		private State(
@@ -183,30 +192,6 @@ public final class BlastFurnace
 			this.bars = Collections.unmodifiableMap(bars);
 			this.coolingGlovesEquipped = coolingGlovesEquipped;
 			this.atBlastFurnace = atBlastFurnace;
-		}
-
-		/** @return current dispenser state */
-		public DispenserState getDispenserState()
-		{
-			return dispenserState;
-		}
-
-		/** @return coffer balance in coins */
-		public int getCofferCoins()
-		{
-			return cofferCoins;
-		}
-
-		/** @return immutable map containing nonzero stored-material counts */
-		public Map<Material, Integer> getMaterials()
-		{
-			return materials;
-		}
-
-		/** @return immutable map containing nonzero stored-bar counts */
-		public Map<Bar, Integer> getBars()
-		{
-			return bars;
 		}
 
 		/**
@@ -250,16 +235,5 @@ public final class BlastFurnace
 				|| dispenserState == DispenserState.HOT && coolingGlovesEquipped;
 		}
 
-		/** @return whether ice-capable gloves are currently equipped */
-		public boolean isCoolingGlovesEquipped()
-		{
-			return coolingGlovesEquipped;
-		}
-
-		/** @return whether the local player is in the Blast Furnace region */
-		public boolean isAtBlastFurnace()
-		{
-			return atBlastFurnace;
-		}
 	}
 }

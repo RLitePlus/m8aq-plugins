@@ -6,6 +6,7 @@ import java.util.EnumSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import lombok.Getter;
 import net.runelite.api.Client;
 import net.runelite.api.Player;
 import net.runelite.api.gameval.InterfaceID;
@@ -278,19 +279,47 @@ public final class GiantsFoundry
 	/** Immutable Giants' Foundry state captured from one client read. */
 	public static final class State
 	{
+		/** @return immutable set of active commission descriptors */
+		@Getter
 		private final Set<CommissionType> commissionTypes;
+		/** @return immutable map containing nonzero crucible bar counts */
+		@Getter
 		private final Map<Bar, Integer> crucibleContents;
+		/** @return total number of bars represented in the crucible */
+		@Getter
 		private final int crucibleBarCount;
+		/** @return whether the refinement HUD is visible */
+		@Getter
 		private final boolean refining;
+		/** @return whether the current preform is in Foundry storage */
+		@Getter
 		private final boolean preformStored;
+		/** @return raw preform temperature on the 0-1000 HUD scale */
+		@Getter
 		private final int temperature;
+		/** @return raw preform completion on the 0-1000 HUD scale */
+		@Getter
 		private final int completion;
+		/** @return current preform quality */
+		@Getter
 		private final int quality;
+		/** @return quality assigned when the preform was poured */
+		@Getter
 		private final int startingQuality;
+		/** @return tool required by the current completion section */
+		@Getter
 		private final Tool requiredTool;
+		/** @return current temperature relative to the required tool range */
+		@Getter
 		private final TemperatureStatus temperatureStatus;
+		/** @return whether an unclaimed sweet-spot bonus is active */
+		@Getter
 		private final boolean bonusActive;
+		/** @return whether the completed-sword hand-in indicator is visible */
+		@Getter
 		private final boolean readyToHandIn;
+		/** @return whether the local player is in the Giants' Foundry region */
+		@Getter
 		private final boolean atGiantsFoundry;
 
 		private State(
@@ -326,18 +355,6 @@ public final class GiantsFoundry
 			this.atGiantsFoundry = atGiantsFoundry;
 		}
 
-		/** @return immutable set of active commission descriptors */
-		public Set<CommissionType> getCommissionTypes()
-		{
-			return commissionTypes;
-		}
-
-		/** @return immutable map containing nonzero crucible bar counts */
-		public Map<Bar, Integer> getCrucibleContents()
-		{
-			return crucibleContents;
-		}
-
 		/**
 		 * Returns a crucible bar count.
 		 *
@@ -349,82 +366,11 @@ public final class GiantsFoundry
 			return crucibleContents.getOrDefault(bar, 0);
 		}
 
-		/** @return total number of bars represented in the crucible */
-		public int getCrucibleBarCount()
-		{
-			return crucibleBarCount;
-		}
-
 		/** @return whether the crucible contains its full 28 bars */
 		public boolean isCrucibleFull()
 		{
 			return crucibleBarCount == CRUCIBLE_CAPACITY;
 		}
 
-		/** @return whether the refinement HUD is visible */
-		public boolean isRefining()
-		{
-			return refining;
-		}
-
-		/** @return whether the current preform is in Foundry storage */
-		public boolean isPreformStored()
-		{
-			return preformStored;
-		}
-
-		/** @return raw preform temperature on the 0-1000 HUD scale */
-		public int getTemperature()
-		{
-			return temperature;
-		}
-
-		/** @return raw preform completion on the 0-1000 HUD scale */
-		public int getCompletion()
-		{
-			return completion;
-		}
-
-		/** @return current preform quality */
-		public int getQuality()
-		{
-			return quality;
-		}
-
-		/** @return quality assigned when the preform was poured */
-		public int getStartingQuality()
-		{
-			return startingQuality;
-		}
-
-		/** @return tool required by the current completion section */
-		public Tool getRequiredTool()
-		{
-			return requiredTool;
-		}
-
-		/** @return current temperature relative to the required tool range */
-		public TemperatureStatus getTemperatureStatus()
-		{
-			return temperatureStatus;
-		}
-
-		/** @return whether an unclaimed sweet-spot bonus is active */
-		public boolean isBonusActive()
-		{
-			return bonusActive;
-		}
-
-		/** @return whether the completed-sword hand-in indicator is visible */
-		public boolean isReadyToHandIn()
-		{
-			return readyToHandIn;
-		}
-
-		/** @return whether the local player is in the Giants' Foundry region */
-		public boolean isAtGiantsFoundry()
-		{
-			return atGiantsFoundry;
-		}
 	}
 }

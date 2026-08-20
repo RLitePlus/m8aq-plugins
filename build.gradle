@@ -16,7 +16,9 @@ def runeLiteVersion = 'latest.release'
 
 dependencies {
 	compileOnly group: 'net.runelite', name: 'client', version: runeLiteVersion
+	compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.46'
 	compileOnly group: 'org.jetbrains', name: 'annotations', version: '24.1.0'
+	annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.46'
 	runtimeOnly group: 'net.runelite', name: 'client', version: runeLiteVersion
 	testImplementation group: 'net.runelite', name: 'client', version: runeLiteVersion
 	testImplementation group: 'junit', name: 'junit', version: '4.13.2'
@@ -26,7 +28,7 @@ dependencies {
 tasks.withType(JavaCompile).configureEach {
 	options.encoding = 'UTF-8'
 	options.release.set(11)
-	options.compilerArgs << '-Xlint:all' << '-Werror'
+	options.compilerArgs << '-Xlint:all,-processing' << '-Werror'
 }
 
 tasks.named('jar') {

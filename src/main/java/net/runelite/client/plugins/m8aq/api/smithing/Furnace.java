@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import lombok.Getter;
 import net.runelite.api.Client;
 import net.runelite.api.ItemComposition;
 import net.runelite.api.Player;
@@ -107,25 +108,17 @@ public final class Furnace
 	/** Immutable product displayed by the bar-smelting interface. */
 	public static final class Product
 	{
+		/** @return output item ID */
+		@Getter
 		private final int itemId;
+		/** @return output item name */
+		@Getter
 		private final String name;
 
 		private Product(int itemId, String name)
 		{
 			this.itemId = itemId;
 			this.name = name;
-		}
-
-		/** @return output item ID */
-		public int getItemId()
-		{
-			return itemId;
-		}
-
-		/** @return output item name */
-		public String getName()
-		{
-			return name;
 		}
 
 		@Override
@@ -138,9 +131,17 @@ public final class Furnace
 	/** Immutable furnace state captured from one client read. */
 	public static final class State
 	{
+		/** @return whether the ordinary bar-smelting selection screen is visible */
+		@Getter
 		private final boolean open;
+		/** @return whether the local player is performing a furnace animation */
+		@Getter
 		private final boolean operatingFurnace;
+		/** @return requested smelting quantity, or zero while the screen is closed */
+		@Getter
 		private final int requestedQuantity;
+		/** @return immutable list of products currently displayed */
+		@Getter
 		private final List<Product> displayedProducts;
 
 		private State(
@@ -155,28 +156,5 @@ public final class Furnace
 			this.displayedProducts = displayedProducts;
 		}
 
-		/** @return whether the ordinary bar-smelting selection screen is visible */
-		public boolean isOpen()
-		{
-			return open;
-		}
-
-		/** @return whether the local player is performing a furnace animation */
-		public boolean isOperatingFurnace()
-		{
-			return operatingFurnace;
-		}
-
-		/** @return requested smelting quantity, or zero while the screen is closed */
-		public int getRequestedQuantity()
-		{
-			return requestedQuantity;
-		}
-
-		/** @return immutable list of products currently displayed */
-		public List<Product> getDisplayedProducts()
-		{
-			return displayedProducts;
-		}
 	}
 }

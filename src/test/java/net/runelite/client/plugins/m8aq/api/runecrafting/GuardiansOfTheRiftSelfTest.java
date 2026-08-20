@@ -242,18 +242,20 @@ public final class GuardiansOfTheRiftSelfTest
 
 	private static ItemContainer inventory(Item... items)
 	{
+		Item[] slots = Arrays.copyOf(items, 28);
+		Arrays.fill(slots, items.length, slots.length, new Item(-1, 0));
 		return proxy(ItemContainer.class, (method, args) ->
 		{
 			switch (method)
 			{
 				case "getItems":
-					return items;
+					return slots;
 				case "contains":
-					return Arrays.stream(items).anyMatch(item -> item.getId() == (int) args[0]);
+					return Arrays.stream(slots).anyMatch(item -> item.getId() == (int) args[0]);
 				case "count":
 					return args == null
-						? items.length
-						: Arrays.stream(items)
+						? slots.length
+						: Arrays.stream(slots)
 							.filter(item -> item.getId() == (int) args[0])
 							.mapToInt(Item::getQuantity)
 							.sum();
