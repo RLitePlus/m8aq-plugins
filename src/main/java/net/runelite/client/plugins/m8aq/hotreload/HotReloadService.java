@@ -27,9 +27,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /** Replaces one generation of development plugins with the next rebuilt JAR. */
-final class HotreloadService implements AutoCloseable
+final class HotReloadService implements AutoCloseable
 {
-	private static final Logger LOG = LoggerFactory.getLogger(HotreloadService.class);
+	private static final Logger LOG = LoggerFactory.getLogger(HotReloadService.class);
 	private static final long POLL_MILLIS = 750L;
 
 	private final Path devJar;
@@ -43,7 +43,7 @@ final class HotreloadService implements AutoCloseable
 	private URLClassLoader currentLoader;
 	private List<Plugin> currentPlugins = Collections.emptyList();
 
-	HotreloadService(Path devJar, PluginManager pluginManager, EventBus eventBus, ClassLoader parent)
+	HotReloadService(Path devJar, PluginManager pluginManager, EventBus eventBus, ClassLoader parent)
 	{
 		this.devJar = devJar;
 		this.pluginManager = pluginManager;
@@ -114,7 +114,7 @@ final class HotreloadService implements AutoCloseable
 
 	private Candidate openCandidate() throws IOException, ClassNotFoundException
 	{
-		HotreloadClassLoader loader = new HotreloadClassLoader(
+		HotReloadClassLoader loader = new HotReloadClassLoader(
 			new URL[]{devJar.toUri().toURL()}, parent);
 		try
 		{
@@ -314,13 +314,13 @@ final class HotreloadService implements AutoCloseable
 		}
 	}
 
-	private static final class HotreloadClassLoader extends URLClassLoader
+	private static final class HotReloadClassLoader extends URLClassLoader
 		implements ReflectUtil.PrivateLookupableClassLoader
 	{
 		@Getter(onMethod_ = @Override)
 		private MethodHandles.Lookup lookup;
 
-		private HotreloadClassLoader(URL[] urls, ClassLoader parent)
+		private HotReloadClassLoader(URL[] urls, ClassLoader parent)
 		{
 			super(urls, parent);
 			ReflectUtil.installLookupHelper(this);

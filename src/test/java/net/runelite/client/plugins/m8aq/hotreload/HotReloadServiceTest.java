@@ -11,15 +11,15 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 
 /** Verifies development plugin class selection. */
-public class HotreloadServiceTest
+public class HotReloadServiceTest
 {
 	@Test
 	public void selectsOnlyConcreteDescriptorPlugins()
 	{
-		assertTrue(HotreloadService.isPluginClass(FixturePlugin.class));
-		assertFalse(HotreloadService.isPluginClass(MissingDescriptorPlugin.class));
-		assertFalse(HotreloadService.isPluginClass(AbstractFixturePlugin.class));
-		assertFalse(HotreloadService.isPluginClass(String.class));
+		assertTrue(HotReloadService.isPluginClass(FixturePlugin.class));
+		assertFalse(HotReloadService.isPluginClass(MissingDescriptorPlugin.class));
+		assertFalse(HotReloadService.isPluginClass(AbstractFixturePlugin.class));
+		assertFalse(HotReloadService.isPluginClass(String.class));
 	}
 
 	@Test
@@ -35,7 +35,7 @@ public class HotreloadServiceTest
 	@Test
 	public void startsEnabledByDefault()
 	{
-		PluginDescriptor descriptor = HotreloadPlugin.class.getAnnotation(PluginDescriptor.class);
+		PluginDescriptor descriptor = HotReloadPlugin.class.getAnnotation(PluginDescriptor.class);
 		assertEquals("Hot Reload", descriptor.name());
 		assertTrue(descriptor.enabledByDefault());
 	}

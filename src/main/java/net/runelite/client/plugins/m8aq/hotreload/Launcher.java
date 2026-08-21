@@ -47,7 +47,7 @@ public final class Launcher
 
 	private static void configureDefaultTarget() throws IOException, InterruptedException
 	{
-		String configuredJar = System.getProperty(HotreloadPlugin.DEV_JAR_PROPERTY);
+		String configuredJar = System.getProperty(HotReloadPlugin.DEV_JAR_PROPERTY);
 		if (configuredJar != null && !configuredJar.trim().isEmpty())
 		{
 			return;
@@ -72,7 +72,7 @@ public final class Launcher
 		{
 			throw new IllegalStateException("Development JAR was not produced: " + devJar);
 		}
-		System.setProperty(HotreloadPlugin.DEV_JAR_PROPERTY, devJar.toString());
+		System.setProperty(HotReloadPlugin.DEV_JAR_PROPERTY, devJar.toString());
 
 		Process continuousBuild = startGradle(projectDir, ":jar", "--continuous", "--quiet");
 		Runtime.getRuntime().addShutdownHook(new Thread(

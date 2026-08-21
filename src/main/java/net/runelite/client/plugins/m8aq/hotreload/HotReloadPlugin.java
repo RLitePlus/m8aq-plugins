@@ -18,12 +18,12 @@ import org.slf4j.LoggerFactory;
 	developerPlugin = true,
 	enabledByDefault = true
 )
-public final class HotreloadPlugin extends Plugin
+public final class HotReloadPlugin extends Plugin
 {
 	/** System property containing the development JAR path. */
 	public static final String DEV_JAR_PROPERTY = "hotreload.devjar";
 
-	private static final Logger LOG = LoggerFactory.getLogger(HotreloadPlugin.class);
+	private static final Logger LOG = LoggerFactory.getLogger(HotReloadPlugin.class);
 
 	@Inject
 	private PluginManager pluginManager;
@@ -31,7 +31,7 @@ public final class HotreloadPlugin extends Plugin
 	@Inject
 	private EventBus eventBus;
 
-	private HotreloadService service;
+	private HotReloadService service;
 
 	@Override
 	protected void startUp()
@@ -39,13 +39,13 @@ public final class HotreloadPlugin extends Plugin
 		String configured = System.getProperty(DEV_JAR_PROPERTY);
 		if (configured == null || configured.trim().isEmpty())
 		{
-			LOG.info("{} is not set; Hotreload is idle", DEV_JAR_PROPERTY);
+			LOG.info("{} is not set; Hot Reload is idle", DEV_JAR_PROPERTY);
 			return;
 		}
 
 		Path devJar = Paths.get(configured.trim()).toAbsolutePath();
 		LOG.info("Watching development JAR {}", devJar);
-		service = new HotreloadService(devJar, pluginManager, eventBus, getClass().getClassLoader());
+		service = new HotReloadService(devJar, pluginManager, eventBus, getClass().getClassLoader());
 		service.start();
 	}
 
