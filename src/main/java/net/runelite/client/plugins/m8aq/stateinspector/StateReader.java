@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.m8aq.stateinspector;
 
+import com.google.gson.Gson;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -11,6 +12,8 @@ import net.runelite.api.Client;
 
 final class StateReader
 {
+	private static final Gson GSON = new Gson();
+
 	private StateReader()
 	{
 	}
@@ -50,7 +53,7 @@ final class StateReader
 	{
 		try
 		{
-			return String.valueOf(method.invoke(state));
+			return format(method.invoke(state));
 		}
 		catch (IllegalAccessException ex)
 		{
@@ -60,6 +63,14 @@ final class StateReader
 		{
 			return error(ex.getCause());
 		}
+	}
+
+	private static String format(Object value)
+	{
+		return value == null || value instanceof Number || value instanceof Boolean
+			|| value instanceof CharSequence || value instanceof Character || value.getClass().isEnum()
+			? String.valueOf(value)
+			: GSON.toJson(value);
 	}
 
 	private static String error(Throwable throwable)

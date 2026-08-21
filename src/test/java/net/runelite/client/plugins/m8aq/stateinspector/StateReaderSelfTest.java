@@ -36,8 +36,10 @@ public final class StateReaderSelfTest
 
 		Map<String, String> values = StateReader.read(FakeApi.class, null);
 		List<String> names = new ArrayList<>(values.keySet());
-		assert names.equals(Arrays.asList("canCollect", "getBroken", "getCount", "isReady", "needsCooling"));
+		assert names.equals(Arrays.asList(
+			"canCollect", "getBroken", "getCount", "getNested", "isReady", "needsCooling"));
 		assert values.get("getCount").equals("28");
+		assert values.get("getNested").equals("{\"entry\":{\"value\":7}}");
 		assert values.get("getBroken").equals("<IllegalStateException: broken>");
 
 		SwingUtilities.invokeAndWait(() ->
@@ -77,6 +79,12 @@ public final class StateReaderSelfTest
 			return 28;
 		}
 
+		/** @return nested value without a custom string representation */
+		public Map<String, FakeValue> getNested()
+		{
+			return Map.of("entry", new FakeValue(7));
+		}
+
 		/** @return readiness */
 		public boolean isReady()
 		{
@@ -111,6 +119,17 @@ public final class StateReaderSelfTest
 		public int getIndexed(int index)
 		{
 			return index;
+		}
+	}
+
+	/** Nested inspector value. */
+	public static final class FakeValue
+	{
+		private final int value;
+
+		private FakeValue(int value)
+		{
+			this.value = value;
 		}
 	}
 }
