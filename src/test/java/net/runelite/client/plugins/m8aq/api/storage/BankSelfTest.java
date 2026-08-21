@@ -5,8 +5,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import net.runelite.api.Client;
 import net.runelite.api.Item;
+import net.runelite.api.ItemComposition;
 import net.runelite.api.ItemContainer;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.InventoryID;
@@ -48,11 +50,11 @@ public final class BankSelfTest
 		assert state.getSlots().size() == 10;
 		assert state.getItem(1).getItemId() == 101;
 		assert state.getItem(1).getQuantity() == 0;
-		assertSlot(state.getItem(0), 100, 4, 0, 0, 0);
-		assertSlot(state.getItem(4), -1, 0, 4, 0, 4);
-		assertSlot(state.getItem(5), 200, 2, 5, 1, 0);
-		assertSlot(state.getItem(7), 300, 1, 7, 2, 0);
-		assertSlot(state.getItem(9), 302, 1, 9, 2, 2);
+		assertSlot(state.getItem(0), 100, "Item 100", 4, 0, 0, 0);
+		assertSlot(state.getItem(4), -1, null, 0, 4, 0, 4);
+		assertSlot(state.getItem(5), 200, "Item 200", 2, 5, 1, 0);
+		assertSlot(state.getItem(7), 300, "Item 300", 1, 7, 2, 0);
+		assertSlot(state.getItem(9), 302, "Item 302", 1, 9, 2, 2);
 		assert state.getItem(4).getItemId() == -1;
 		assert state.getItem(-1) == null;
 		assert state.getItem(10) == null;
@@ -75,10 +77,10 @@ public final class BankSelfTest
 		varbits.put(VarbitID.BANK_TAB_1, 11);
 		varbits.put(VarbitID.BANK_TAB_2, 22);
 		Bank.State large = Bank.getState(client(container(largeBank), widgets, varbits));
-		assertSlot(large.getItem(688), 400, 1, 688, 0, 688);
-		assertSlot(large.getItem(689), 400, 1, 689, 1, 0);
-		assertSlot(large.getItem(700), 400, 1, 700, 2, 0);
-		assertSlot(large.getItem(721), 400, 1, 721, 2, 21);
+		assertSlot(large.getItem(688), 400, "Item 400", 1, 688, 0, 688);
+		assertSlot(large.getItem(689), 400, "Item 400", 1, 689, 1, 0);
+		assertSlot(large.getItem(700), 400, "Item 400", 1, 700, 2, 0);
+		assertSlot(large.getItem(721), 400, "Item 400", 1, 721, 2, 21);
 
 		varbits.put(VarbitID.BANK_TAB_9, 20);
 		Bank.State inconsistent = Bank.getState(client(container(items), widgets, varbits));
@@ -100,12 +102,14 @@ public final class BankSelfTest
 	private static void assertSlot(
 		Bank.BankSlot slot,
 		int itemId,
+		String itemName,
 		int quantity,
 		int absoluteSlot,
 		int tabNumber,
 		int positionInTab)
 	{
 		assert slot.getItemId() == itemId;
+		assert Objects.equals(slot.getItemName(), itemName);
 		assert slot.getQuantity() == quantity;
 		assert slot.getSlot() == absoluteSlot;
 		assert slot.getTabNumber() == tabNumber;
@@ -150,6 +154,8 @@ public final class BankSelfTest
 		{
 			switch (method)
 			{
+				case "getItemDefinition":
+					return itemDefinition((int) args[0]);
 				case "getItemContainer":
 					return (int) args[0] == InventoryID.BANK ? bank : null;
 				case "getWidget":
@@ -160,6 +166,12 @@ public final class BankSelfTest
 					return null;
 			}
 		});
+	}
+
+	private static ItemComposition itemDefinition(int itemId)
+	{
+		return proxy(ItemComposition.class, (method, args) ->
+			"getName".equals(method) ? "Item " + itemId : null);
 	}
 
 	private static Widget widget(boolean hidden, String text)

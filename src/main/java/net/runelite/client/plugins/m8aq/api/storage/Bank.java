@@ -14,6 +14,7 @@ import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.InventoryID;
 import net.runelite.api.gameval.VarbitID;
 import net.runelite.api.widgets.Widget;
+import net.runelite.client.plugins.m8aq.api.items.ItemNames;
 
 /** Provides a read-only snapshot of the currently loaded bank. */
 public final class Bank
@@ -80,7 +81,8 @@ public final class Bank
 				}
 				tabStart = tabEnd;
 			}
-			slots.add(new BankSlot(item.getId(), item.getQuantity(), slot, tabNumber, positionInTab));
+			slots.add(new BankSlot(
+				item.getId(), ItemNames.get(client, item.getId()), item.getQuantity(), slot, tabNumber, positionInTab));
 		}
 		List<BankSlot> immutableSlots = Collections.unmodifiableList(slots);
 		return new State(
@@ -149,6 +151,9 @@ public final class Bank
 		/** @return exact raw item ID */
 		@Getter
 		private final int itemId;
+		/** @return canonical item name, or {@code null} for an empty/unresolved ID */
+		@Getter
+		private final String itemName;
 		/** @return raw item quantity */
 		@Getter
 		private final int quantity;
@@ -162,9 +167,10 @@ public final class Bank
 		@Getter
 		private final int positionInTab;
 
-		private BankSlot(int itemId, int quantity, int slot, int tabNumber, int positionInTab)
+		private BankSlot(int itemId, String itemName, int quantity, int slot, int tabNumber, int positionInTab)
 		{
 			this.itemId = itemId;
+			this.itemName = itemName;
 			this.quantity = quantity;
 			this.slot = slot;
 			this.tabNumber = tabNumber;
