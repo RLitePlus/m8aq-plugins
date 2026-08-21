@@ -14,7 +14,6 @@ import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.InventoryID;
 import net.runelite.api.gameval.VarbitID;
 import net.runelite.api.widgets.Widget;
-import net.runelite.client.plugins.m8aq.api.items.ItemSlot;
 
 /** Provides a read-only snapshot of the currently loaded bank. */
 public final class Bank
@@ -54,18 +53,41 @@ public final class Bank
 			return new State(false, open, Collections.emptyList(), -1, Collections.emptyList());
 		}
 
-		List<ItemSlot> slots = new ArrayList<>();
-		for (Item item : container.getItems())
+		Item[] items = container.getItems();
+		int[] tabCounts = readTabCounts(client);
+		int numberedItemCount = 0;
+		for (int count : tabCounts)
 		{
-			slots.add(new ItemSlot(item.getId(), item.getQuantity()));
+			numberedItemCount += count;
 		}
-		List<ItemSlot> immutableSlots = Collections.unmodifiableList(slots);
+		boolean validTabs = numberedItemCount <= items.length;
+		List<BankSlot> slots = new ArrayList<>();
+		for (int slot = 0; slot < items.length; slot++)
+		{
+			Item item = items[slot];
+			int tabNumber = validTabs ? 0 : -1;
+			int positionInTab = validTabs ? slot - numberedItemCount : -1;
+			int tabStart = 0;
+			for (int tab = 0; validTabs && tab < tabCounts.length; tab++)
+			{
+				int tabEnd = tabStart + tabCounts[tab];
+				if (slot < tabEnd)
+				{
+					tabNumber = tab + 1;
+					positionInTab = slot - tabStart;
+					break;
+				}
+				tabStart = tabEnd;
+			}
+			slots.add(new BankSlot(item.getId(), item.getQuantity(), slot, tabNumber, positionInTab));
+		}
+		List<BankSlot> immutableSlots = Collections.unmodifiableList(slots);
 		return new State(
 			true,
 			open,
 			immutableSlots,
 			open ? readCapacity(client.getWidget(InterfaceID.Bankmain.CAPACITY)) : -1,
-			readTabs(client, slots.size()));
+			validTabs ? readTabs(tabCounts) : Collections.emptyList());
 	}
 
 	private static int readCapacity(Widget widget)
@@ -95,20 +117,18 @@ public final class Bank
 		}
 	}
 
-	private static List<BankTab> readTabs(Client client, int slotCount)
+	private static int[] readTabCounts(Client client)
 	{
 		int[] counts = new int[TAB_COUNTS.length];
-		int tabItems = 0;
 		for (int index = 0; index < TAB_COUNTS.length; index++)
 		{
 			counts[index] = Math.max(0, client.getVarbitValue(TAB_COUNTS[index]));
-			tabItems += counts[index];
 		}
-		if (tabItems > slotCount)
-		{
-			return Collections.emptyList();
-		}
+		return counts;
+	}
 
+	private static List<BankTab> readTabs(int[] counts)
+	{
 		int startSlot = 0;
 		List<BankTab> tabs = new ArrayList<>();
 		for (int index = 0; index < counts.length; index++)
@@ -120,6 +140,35 @@ public final class Bank
 			}
 		}
 		return Collections.unmodifiableList(tabs);
+	}
+
+	/** Immutable item entry at one absolute bank-container slot. */
+	public static final class BankSlot
+	{
+		/** @return exact raw item ID */
+		@Getter
+		private final int itemId;
+		/** @return raw item quantity */
+		@Getter
+		private final int quantity;
+		/** @return zero-based absolute bank-container slot */
+		@Getter
+		private final int slot;
+		/** @return normal bank tab number: 0 for main, 1-9 numbered, or -1 when unknown */
+		@Getter
+		private final int tabNumber;
+		/** @return zero-based position within the normal bank tab, or -1 when unknown */
+		@Getter
+		private final int positionInTab;
+
+		private BankSlot(int itemId, int quantity, int slot, int tabNumber, int positionInTab)
+		{
+			this.itemId = itemId;
+			this.quantity = quantity;
+			this.slot = slot;
+			this.tabNumber = tabNumber;
+			this.positionInTab = positionInTab;
+		}
 	}
 
 	/** Immutable visible bank-tab boundary. */
@@ -154,7 +203,7 @@ public final class Bank
 		private final boolean open;
 		/** @return immutable positional bank entries */
 		@Getter
-		private final List<ItemSlot> slots;
+		private final List<BankSlot> slots;
 		/** @return displayed bank capacity, or {@code -1} when unavailable */
 		@Getter
 		private final int capacity;
@@ -165,7 +214,7 @@ public final class Bank
 		private State(
 			boolean available,
 			boolean open,
-			List<ItemSlot> slots,
+			List<BankSlot> slots,
 			int capacity,
 			List<BankTab> tabs)
 		{
@@ -182,7 +231,7 @@ public final class Bank
 		 * @param slot zero-based slot index
 		 * @return immutable slot, or {@code null} when out of bounds
 		 */
-		public ItemSlot getItem(int slot)
+		public BankSlot getItem(int slot)
 		{
 			return slot >= 0 && slot < slots.size() ? slots.get(slot) : null;
 		}
@@ -196,7 +245,7 @@ public final class Bank
 		public int count(int itemId)
 		{
 			int total = 0;
-			for (ItemSlot slot : slots)
+			for (BankSlot slot : slots)
 			{
 				if (slot.getItemId() == itemId)
 				{

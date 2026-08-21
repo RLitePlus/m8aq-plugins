@@ -11,7 +11,6 @@ import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.InventoryID;
 import net.runelite.api.gameval.VarbitID;
 import net.runelite.api.widgets.Widget;
-import net.runelite.client.plugins.m8aq.api.items.ItemSlot;
 
 /** Minimal runnable checks for {@link Bank}. */
 public final class BankSelfTest
@@ -48,6 +47,10 @@ public final class BankSelfTest
 		assert state.getSlots().size() == 10;
 		assert state.getItem(1).getItemId() == 101;
 		assert state.getItem(1).getQuantity() == 0;
+		assertSlot(state.getItem(0), 100, 4, 0, 1, 0);
+		assertSlot(state.getItem(2), 100, 6, 2, 2, 0);
+		assertSlot(state.getItem(5), 200, 2, 5, 0, 0);
+		assertSlot(state.getItem(9), 302, 1, 9, 0, 4);
 		assert state.getItem(4).getItemId() == -1;
 		assert state.getItem(-1) == null;
 		assert state.getItem(10) == null;
@@ -65,12 +68,36 @@ public final class BankSelfTest
 		assert closed.getCapacity() == -1;
 		assert closed.getTabs().size() == 2;
 
+		varbits.put(VarbitID.BANK_TAB_9, 20);
+		Bank.State inconsistent = Bank.getState(client(container(items), widgets, varbits));
+		assert inconsistent.getTabs().isEmpty();
+		for (Bank.BankSlot slot : inconsistent.getSlots())
+		{
+			assert slot.getTabNumber() == -1;
+			assert slot.getPositionInTab() == -1;
+		}
+
 		Bank.State unavailable = Bank.getState(client(null, widgets, varbits));
 		assert !unavailable.isAvailable();
 		assert !unavailable.isOpen();
 		assert unavailable.getSlots().isEmpty();
 		assert unavailable.getCapacity() == -1;
 		assert unavailable.getTabs().isEmpty();
+	}
+
+	private static void assertSlot(
+		Bank.BankSlot slot,
+		int itemId,
+		int quantity,
+		int absoluteSlot,
+		int tabNumber,
+		int positionInTab)
+	{
+		assert slot.getItemId() == itemId;
+		assert slot.getQuantity() == quantity;
+		assert slot.getSlot() == absoluteSlot;
+		assert slot.getTabNumber() == tabNumber;
+		assert slot.getPositionInTab() == positionInTab;
 	}
 
 	private static void assertTab(Bank.BankTab tab, int number, int startSlot, int itemCount)
@@ -80,7 +107,7 @@ public final class BankSelfTest
 		assert tab.getItemCount() == itemCount;
 	}
 
-	private static void assertUnmodifiable(List<ItemSlot> slots, List<Bank.BankTab> tabs)
+	private static void assertUnmodifiable(List<Bank.BankSlot> slots, List<Bank.BankTab> tabs)
 	{
 		try
 		{
