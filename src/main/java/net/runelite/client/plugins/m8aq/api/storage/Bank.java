@@ -61,17 +61,18 @@ public final class Bank
 			numberedItemCount += count;
 		}
 		boolean validTabs = numberedItemCount <= items.length;
+		int mainItemCount = items.length - numberedItemCount;
 		List<BankSlot> slots = new ArrayList<>();
 		for (int slot = 0; slot < items.length; slot++)
 		{
 			Item item = items[slot];
 			int tabNumber = validTabs ? 0 : -1;
-			int positionInTab = validTabs ? slot - numberedItemCount : -1;
-			int tabStart = 0;
+			int positionInTab = validTabs ? slot : -1;
+			int tabStart = mainItemCount;
 			for (int tab = 0; validTabs && tab < tabCounts.length; tab++)
 			{
 				int tabEnd = tabStart + tabCounts[tab];
-				if (slot < tabEnd)
+				if (slot >= tabStart && slot < tabEnd)
 				{
 					tabNumber = tab + 1;
 					positionInTab = slot - tabStart;
@@ -87,7 +88,7 @@ public final class Bank
 			open,
 			immutableSlots,
 			open ? readCapacity(client.getWidget(InterfaceID.Bankmain.CAPACITY)) : -1,
-			validTabs ? readTabs(tabCounts) : Collections.emptyList());
+			validTabs ? readTabs(tabCounts, mainItemCount) : Collections.emptyList());
 	}
 
 	private static int readCapacity(Widget widget)
@@ -127,9 +128,9 @@ public final class Bank
 		return counts;
 	}
 
-	private static List<BankTab> readTabs(int[] counts)
+	private static List<BankTab> readTabs(int[] counts, int mainItemCount)
 	{
-		int startSlot = 0;
+		int startSlot = mainItemCount;
 		List<BankTab> tabs = new ArrayList<>();
 		for (int index = 0; index < counts.length; index++)
 		{

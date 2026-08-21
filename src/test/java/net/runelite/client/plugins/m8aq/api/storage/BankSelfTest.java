@@ -1,6 +1,7 @@
 package net.runelite.client.plugins.m8aq.api.storage;
 
 import java.lang.reflect.Proxy;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,18 +48,19 @@ public final class BankSelfTest
 		assert state.getSlots().size() == 10;
 		assert state.getItem(1).getItemId() == 101;
 		assert state.getItem(1).getQuantity() == 0;
-		assertSlot(state.getItem(0), 100, 4, 0, 1, 0);
-		assertSlot(state.getItem(2), 100, 6, 2, 2, 0);
-		assertSlot(state.getItem(5), 200, 2, 5, 0, 0);
-		assertSlot(state.getItem(9), 302, 1, 9, 0, 4);
+		assertSlot(state.getItem(0), 100, 4, 0, 0, 0);
+		assertSlot(state.getItem(4), -1, 0, 4, 0, 4);
+		assertSlot(state.getItem(5), 200, 2, 5, 1, 0);
+		assertSlot(state.getItem(7), 300, 1, 7, 2, 0);
+		assertSlot(state.getItem(9), 302, 1, 9, 2, 2);
 		assert state.getItem(4).getItemId() == -1;
 		assert state.getItem(-1) == null;
 		assert state.getItem(10) == null;
 		assert state.count(100) == 10;
 		assert state.getCapacity() == 1410;
 		assert state.getTabs().size() == 2;
-		assertTab(state.getTabs().get(0), 1, 0, 2);
-		assertTab(state.getTabs().get(1), 2, 2, 3);
+		assertTab(state.getTabs().get(0), 1, 5, 2);
+		assertTab(state.getTabs().get(1), 2, 7, 3);
 		assertUnmodifiable(state.getSlots(), state.getTabs());
 
 		widgets.put(InterfaceID.Bankmain.UNIVERSE, widget(true, ""));
@@ -67,6 +69,16 @@ public final class BankSelfTest
 		assert !closed.isOpen();
 		assert closed.getCapacity() == -1;
 		assert closed.getTabs().size() == 2;
+
+		Item[] largeBank = new Item[722];
+		Arrays.fill(largeBank, new Item(400, 1));
+		varbits.put(VarbitID.BANK_TAB_1, 11);
+		varbits.put(VarbitID.BANK_TAB_2, 22);
+		Bank.State large = Bank.getState(client(container(largeBank), widgets, varbits));
+		assertSlot(large.getItem(688), 400, 1, 688, 0, 688);
+		assertSlot(large.getItem(689), 400, 1, 689, 1, 0);
+		assertSlot(large.getItem(700), 400, 1, 700, 2, 0);
+		assertSlot(large.getItem(721), 400, 1, 721, 2, 21);
 
 		varbits.put(VarbitID.BANK_TAB_9, 20);
 		Bank.State inconsistent = Bank.getState(client(container(items), widgets, varbits));
