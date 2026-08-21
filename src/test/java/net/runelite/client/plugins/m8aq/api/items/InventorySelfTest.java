@@ -17,27 +17,27 @@ public final class InventorySelfTest
 	/** Runs the checks with Java assertions enabled. */
 	public static void main(String[] args)
 	{
-		Item[] items = new Item[28];
+		Item[] items = new Item[8];
 		for (int slot = 0; slot < items.length; slot++)
 		{
-			items[slot] = new Item(0, 0);
+			items[slot] = new Item(400, 1);
 		}
 		items[0] = new Item(100, 3);
 		items[5] = new Item(100, 2);
-		items[27] = new Item(200, 1);
+		items[7] = new Item(200, 1);
 
-		Inventory.State state = Inventory.getState(client(container(items, 3)));
+		Inventory.State state = Inventory.getState(client(container(items, 8)));
 		assert state.isAvailable();
-		assert state.getSlots().size() == 28;
+		assert state.getSlots().size() == 8;
 		assert state.getItem(0).getItemId() == 100;
 		assert state.getItem(0).getQuantity() == 3;
-		assert state.getItem(1).getItemId() == 0;
+		assert state.getItem(1).getItemId() == 400;
 		assert state.getItem(-1) == null;
-		assert state.getItem(28) == null;
+		assert state.getItem(8) == null;
 		assert state.count(100) == 5;
 		assert state.contains(200);
 		assert !state.contains(300);
-		assert state.getEmptySlotCount() == 25;
+		assert state.getEmptySlotCount() == 20;
 
 		items[0] = new Item(300, 99);
 		assert state.getItem(0).getItemId() == 100;

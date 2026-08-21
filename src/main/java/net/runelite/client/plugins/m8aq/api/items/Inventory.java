@@ -13,6 +13,8 @@ import net.runelite.api.gameval.InventoryID;
 /** Provides a read-only snapshot of the local player's backpack inventory. */
 public final class Inventory
 {
+	private static final int CAPACITY = 28;
+
 	private Inventory()
 	{
 	}
@@ -38,7 +40,7 @@ public final class Inventory
 		{
 			slots.add(new ItemSlot(item.getId(), item.getQuantity()));
 		}
-		return new State(true, Collections.unmodifiableList(slots), container.size() - container.count());
+		return new State(true, Collections.unmodifiableList(slots), CAPACITY - container.count());
 	}
 
 	/** Immutable backpack state captured from one client read. */
@@ -47,7 +49,7 @@ public final class Inventory
 		/** @return whether the backpack container was available */
 		@Getter
 		private final boolean available;
-		/** @return immutable positional slots, including empty slots */
+		/** @return immutable materialized positional slots; trailing empty slots may be omitted */
 		@Getter
 		private final List<ItemSlot> slots;
 		/** @return number of empty slots, or zero when unavailable */
