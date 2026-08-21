@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 
 /** Loads and reloads RuneLite plugins from a development JAR. */
 @PluginDescriptor(
-	name = "Hotreload",
+	name = "Hot Reload",
 	description = "Reloads plugins from a rebuilt development JAR",
 	tags = {"developer", "hotreload"},
 	developerPlugin = true,
