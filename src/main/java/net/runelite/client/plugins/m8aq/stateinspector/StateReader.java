@@ -1,6 +1,7 @@
 package net.runelite.client.plugins.m8aq.stateinspector;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -12,7 +13,7 @@ import net.runelite.api.Client;
 
 final class StateReader
 {
-	private static final Gson GSON = new Gson();
+	private static final Gson GSON = new GsonBuilder().serializeNulls().create();
 
 	private StateReader()
 	{
