@@ -20,18 +20,18 @@ public final class InventorySelfTest
 		Item[] items = new Item[28];
 		for (int slot = 0; slot < items.length; slot++)
 		{
-			items[slot] = new Item(-1, 0);
+			items[slot] = new Item(0, 0);
 		}
 		items[0] = new Item(100, 3);
 		items[5] = new Item(100, 2);
 		items[27] = new Item(200, 1);
 
-		Inventory.State state = Inventory.getState(client(container(items)));
+		Inventory.State state = Inventory.getState(client(container(items, 3)));
 		assert state.isAvailable();
 		assert state.getSlots().size() == 28;
 		assert state.getItem(0).getItemId() == 100;
 		assert state.getItem(0).getQuantity() == 3;
-		assert state.getItem(1).getItemId() == -1;
+		assert state.getItem(1).getItemId() == 0;
 		assert state.getItem(-1) == null;
 		assert state.getItem(28) == null;
 		assert state.count(100) == 5;
@@ -72,7 +72,7 @@ public final class InventorySelfTest
 				: null);
 	}
 
-	private static ItemContainer container(Item[] items)
+	private static ItemContainer container(Item[] items, int filledSlots)
 	{
 		return proxy(ItemContainer.class, (method, args) ->
 		{
@@ -88,7 +88,7 @@ public final class InventorySelfTest
 				case "contains":
 					return count(items, (int) args[0]) > 0;
 				case "count":
-					return args == null ? filledSlots(items) : count(items, (int) args[0]);
+					return args == null ? filledSlots : count(items, (int) args[0]);
 				case "size":
 					return items.length;
 				case "find":
@@ -107,19 +107,6 @@ public final class InventorySelfTest
 			if (item.getId() == itemId)
 			{
 				total += item.getQuantity();
-			}
-		}
-		return total;
-	}
-
-	private static int filledSlots(Item[] items)
-	{
-		int total = 0;
-		for (Item item : items)
-		{
-			if (item.getId() >= 0)
-			{
-				total++;
 			}
 		}
 		return total;

@@ -30,7 +30,7 @@ public final class Inventory
 		ItemContainer container = client.getItemContainer(InventoryID.INV);
 		if (container == null)
 		{
-			return new State(false, Collections.emptyList());
+			return new State(false, Collections.emptyList(), 0);
 		}
 
 		List<ItemSlot> slots = new ArrayList<>();
@@ -38,7 +38,7 @@ public final class Inventory
 		{
 			slots.add(new ItemSlot(item.getId(), item.getQuantity()));
 		}
-		return new State(true, Collections.unmodifiableList(slots));
+		return new State(true, Collections.unmodifiableList(slots), container.size() - container.count());
 	}
 
 	/** Immutable backpack state captured from one client read. */
@@ -50,11 +50,15 @@ public final class Inventory
 		/** @return immutable positional slots, including empty slots */
 		@Getter
 		private final List<ItemSlot> slots;
+		/** @return number of empty slots, or zero when unavailable */
+		@Getter
+		private final int emptySlotCount;
 
-		private State(boolean available, List<ItemSlot> slots)
+		private State(boolean available, List<ItemSlot> slots, int emptySlotCount)
 		{
 			this.available = available;
 			this.slots = slots;
+			this.emptySlotCount = emptySlotCount;
 		}
 
 		/**
@@ -105,18 +109,5 @@ public final class Inventory
 			return false;
 		}
 
-		/** @return number of explicitly empty slots, or zero when unavailable */
-		public int getEmptySlotCount()
-		{
-			int total = 0;
-			for (ItemSlot slot : slots)
-			{
-				if (slot.getItemId() < 0)
-				{
-					total++;
-				}
-			}
-			return total;
-		}
 	}
 }
