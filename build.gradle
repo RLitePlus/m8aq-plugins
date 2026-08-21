@@ -51,6 +51,12 @@ tasks.register('blastFurnaceSelfTest', JavaExec) {
 	jvmArgs '-ea'
 }
 
+tasks.register('bankSelfTest', JavaExec) {
+	classpath = sourceSets.test.runtimeClasspath
+	mainClass = 'net.runelite.client.plugins.m8aq.api.storage.BankSelfTest'
+	jvmArgs '-ea'
+}
+
 tasks.register('giantsFoundrySelfTest', JavaExec) {
 	classpath = sourceSets.test.runtimeClasspath
 	mainClass = 'net.runelite.client.plugins.m8aq.api.smithing.GiantsFoundrySelfTest'
@@ -63,9 +69,27 @@ tasks.register('essencePouchesSelfTest', JavaExec) {
 	jvmArgs '-ea'
 }
 
+tasks.register('equipmentSelfTest', JavaExec) {
+	classpath = sourceSets.test.runtimeClasspath
+	mainClass = 'net.runelite.client.plugins.m8aq.api.items.EquipmentSelfTest'
+	jvmArgs '-ea'
+}
+
 tasks.register('guardiansOfTheRiftSelfTest', JavaExec) {
 	classpath = sourceSets.test.runtimeClasspath
 	mainClass = 'net.runelite.client.plugins.m8aq.api.runecrafting.GuardiansOfTheRiftSelfTest'
+	jvmArgs '-ea'
+}
+
+tasks.register('inventorySelfTest', JavaExec) {
+	classpath = sourceSets.test.runtimeClasspath
+	mainClass = 'net.runelite.client.plugins.m8aq.api.items.InventorySelfTest'
+	jvmArgs '-ea'
+}
+
+tasks.register('locationSelfTest', JavaExec) {
+	classpath = sourceSets.test.runtimeClasspath
+	mainClass = 'net.runelite.client.plugins.m8aq.api.player.LocationSelfTest'
 	jvmArgs '-ea'
 }
 
@@ -81,6 +105,12 @@ tasks.register('smithingStationsSelfTest', JavaExec) {
 	jvmArgs '-ea'
 }
 
+tasks.register('skillsSelfTest', JavaExec) {
+	classpath = sourceSets.test.runtimeClasspath
+	mainClass = 'net.runelite.client.plugins.m8aq.api.player.SkillsSelfTest'
+	jvmArgs '-ea'
+}
+
 tasks.register('run', JavaExec) {
 	dependsOn hotreloadJar
 	classpath = files(hotreloadJar) + configurations.runtimeClasspath
@@ -93,6 +123,8 @@ tasks.register('run', JavaExec) {
 }
 
 tasks.named('check') {
-	dependsOn 'blastFurnaceSelfTest', 'essencePouchesSelfTest', 'giantsFoundrySelfTest',
-		'guardiansOfTheRiftSelfTest', 'smithingStationsSelfTest', 'stateReaderSelfTest'
+	dependsOn 'bankSelfTest', 'blastFurnaceSelfTest', 'equipmentSelfTest', 'essencePouchesSelfTest',
+		'giantsFoundrySelfTest',
+		'guardiansOfTheRiftSelfTest', 'inventorySelfTest', 'locationSelfTest', 'skillsSelfTest',
+		'smithingStationsSelfTest', 'stateReaderSelfTest'
 }
