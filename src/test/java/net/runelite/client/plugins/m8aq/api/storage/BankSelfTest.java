@@ -43,6 +43,7 @@ public final class BankSelfTest
 		Map<Integer, Integer> varbits = new HashMap<>();
 		varbits.put(VarbitID.BANK_TAB_1, 2);
 		varbits.put(VarbitID.BANK_TAB_2, 3);
+		varbits.put(VarbitID.BANK_CURRENTTAB, 0);
 
 		Bank.State state = Bank.getState(client(container(items), widgets, varbits));
 		assert state.isAvailable();
@@ -50,26 +51,32 @@ public final class BankSelfTest
 		assert state.getSlots().size() == 10;
 		assert state.getItem(1).getItemId() == 101;
 		assert state.getItem(1).getQuantity() == 0;
-		assertSlot(state.getItem(0), 100, "Item 100", 4, 0, 0, 0);
-		assertSlot(state.getItem(4), -1, null, 0, 4, 0, 4);
-		assertSlot(state.getItem(5), 200, "Item 200", 2, 5, 1, 0);
-		assertSlot(state.getItem(7), 300, "Item 300", 1, 7, 2, 0);
-		assertSlot(state.getItem(9), 302, "Item 302", 1, 9, 2, 2);
+		assertSlot(state.getItem(0), 100, "Item 100", 4, 0, 1, 0);
+		assertSlot(state.getItem(2), 100, "Item 100", 6, 2, 2, 0);
+		assertSlot(state.getItem(4), -1, null, 0, 4, 2, 2);
+		assertSlot(state.getItem(5), 200, "Item 200", 2, 5, 0, 0);
+		assertSlot(state.getItem(9), 302, "Item 302", 1, 9, 0, 4);
 		assert state.getItem(4).getItemId() == -1;
 		assert state.getItem(-1) == null;
 		assert state.getItem(10) == null;
 		assert state.count(100) == 10;
 		assert state.getCapacity() == 1410;
+		assert state.getSelectedTab() == 0;
 		assert state.getTabs().size() == 2;
-		assertTab(state.getTabs().get(0), 1, 5, 2);
-		assertTab(state.getTabs().get(1), 2, 7, 3);
+		assertTab(state.getTabs().get(0), 1, 0, 2);
+		assertTab(state.getTabs().get(1), 2, 2, 3);
 		assertUnmodifiable(state.getSlots(), state.getTabs());
+
+		varbits.put(VarbitID.BANK_CURRENTTAB, 1);
+		Bank.State firstTab = Bank.getState(client(container(items), widgets, varbits));
+		assert firstTab.getSelectedTab() == 1;
 
 		widgets.put(InterfaceID.Bankmain.UNIVERSE, widget(true, ""));
 		Bank.State closed = Bank.getState(client(container(items), widgets, varbits));
 		assert closed.isAvailable();
 		assert !closed.isOpen();
 		assert closed.getCapacity() == -1;
+		assert closed.getSelectedTab() == -1;
 		assert closed.getTabs().size() == 2;
 
 		Item[] largeBank = new Item[722];
@@ -77,10 +84,12 @@ public final class BankSelfTest
 		varbits.put(VarbitID.BANK_TAB_1, 11);
 		varbits.put(VarbitID.BANK_TAB_2, 22);
 		Bank.State large = Bank.getState(client(container(largeBank), widgets, varbits));
-		assertSlot(large.getItem(688), 400, "Item 400", 1, 688, 0, 688);
-		assertSlot(large.getItem(689), 400, "Item 400", 1, 689, 1, 0);
-		assertSlot(large.getItem(700), 400, "Item 400", 1, 700, 2, 0);
-		assertSlot(large.getItem(721), 400, "Item 400", 1, 721, 2, 21);
+		assertSlot(large.getItem(0), 400, "Item 400", 1, 0, 1, 0);
+		assertSlot(large.getItem(10), 400, "Item 400", 1, 10, 1, 10);
+		assertSlot(large.getItem(11), 400, "Item 400", 1, 11, 2, 0);
+		assertSlot(large.getItem(32), 400, "Item 400", 1, 32, 2, 21);
+		assertSlot(large.getItem(33), 400, "Item 400", 1, 33, 0, 0);
+		assertSlot(large.getItem(721), 400, "Item 400", 1, 721, 0, 688);
 
 		varbits.put(VarbitID.BANK_TAB_9, 20);
 		Bank.State inconsistent = Bank.getState(client(container(items), widgets, varbits));
@@ -96,6 +105,7 @@ public final class BankSelfTest
 		assert !unavailable.isOpen();
 		assert unavailable.getSlots().isEmpty();
 		assert unavailable.getCapacity() == -1;
+		assert unavailable.getSelectedTab() == -1;
 		assert unavailable.getTabs().isEmpty();
 	}
 

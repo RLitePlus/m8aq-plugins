@@ -51,7 +51,7 @@ public final class Bank
 		ItemContainer container = client.getItemContainer(InventoryID.BANK);
 		if (container == null)
 		{
-			return new State(false, open, Collections.emptyList(), -1, Collections.emptyList());
+			return new State(false, open, Collections.emptyList(), -1, -1, Collections.emptyList());
 		}
 
 		Item[] items = container.getItems();
@@ -62,14 +62,13 @@ public final class Bank
 			numberedItemCount += count;
 		}
 		boolean validTabs = numberedItemCount <= items.length;
-		int mainItemCount = items.length - numberedItemCount;
 		List<BankSlot> slots = new ArrayList<>();
 		for (int slot = 0; slot < items.length; slot++)
 		{
 			Item item = items[slot];
 			int tabNumber = validTabs ? 0 : -1;
-			int positionInTab = validTabs ? slot : -1;
-			int tabStart = mainItemCount;
+			int positionInTab = validTabs ? slot - numberedItemCount : -1;
+			int tabStart = 0;
 			for (int tab = 0; validTabs && tab < tabCounts.length; tab++)
 			{
 				int tabEnd = tabStart + tabCounts[tab];
@@ -90,7 +89,8 @@ public final class Bank
 			open,
 			immutableSlots,
 			open ? readCapacity(client.getWidget(InterfaceID.Bankmain.CAPACITY)) : -1,
-			validTabs ? readTabs(tabCounts, mainItemCount) : Collections.emptyList());
+			open ? client.getVarbitValue(VarbitID.BANK_CURRENTTAB) : -1,
+			validTabs ? readTabs(tabCounts) : Collections.emptyList());
 	}
 
 	private static int readCapacity(Widget widget)
@@ -130,9 +130,9 @@ public final class Bank
 		return counts;
 	}
 
-	private static List<BankTab> readTabs(int[] counts, int mainItemCount)
+	private static List<BankTab> readTabs(int[] counts)
 	{
-		int startSlot = mainItemCount;
+		int startSlot = 0;
 		List<BankTab> tabs = new ArrayList<>();
 		for (int index = 0; index < counts.length; index++)
 		{
@@ -214,6 +214,9 @@ public final class Bank
 		/** @return displayed bank capacity, or {@code -1} when unavailable */
 		@Getter
 		private final int capacity;
+		/** @return selected bank view: 0 for All, 1-9 for numbered tabs, another raw special view, or -1 when unavailable */
+		@Getter
+		private final int selectedTab;
 		/** @return immutable visible bank-tab boundaries in order */
 		@Getter
 		private final List<BankTab> tabs;
@@ -223,12 +226,14 @@ public final class Bank
 			boolean open,
 			List<BankSlot> slots,
 			int capacity,
+			int selectedTab,
 			List<BankTab> tabs)
 		{
 			this.available = available;
 			this.open = open;
 			this.slots = slots;
 			this.capacity = capacity;
+			this.selectedTab = selectedTab;
 			this.tabs = tabs;
 		}
 
