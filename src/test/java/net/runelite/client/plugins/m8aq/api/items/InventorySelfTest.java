@@ -4,6 +4,7 @@ import java.lang.reflect.Proxy;
 import java.util.List;
 import net.runelite.api.Client;
 import net.runelite.api.Item;
+import net.runelite.api.ItemComposition;
 import net.runelite.api.ItemContainer;
 import net.runelite.api.gameval.InventoryID;
 
@@ -30,7 +31,11 @@ public final class InventorySelfTest
 		assert state.isAvailable();
 		assert state.getSlots().size() == 8;
 		assert state.getItem(0).getItemId() == 100;
+		assert state.getItem(0).getSlot() == 0;
+		assert state.getItem(0).getItemName().equals("Item 100");
 		assert state.getItem(0).getQuantity() == 3;
+		assert state.getItem(5).getSlot() == 5;
+		assert state.getItem(5).getItemName().equals("Item 100");
 		assert state.getItem(1).getItemId() == 400;
 		assert state.getItem(-1) == null;
 		assert state.getItem(8) == null;
@@ -38,6 +43,16 @@ public final class InventorySelfTest
 		assert state.contains(200);
 		assert !state.contains(300);
 		assert state.getEmptySlotCount() == 20;
+
+		Inventory.State empty = Inventory.getState(client(container(
+			new Item[]{new Item(-1, 0)}, 0)));
+		assert empty.getItem(0).getSlot() == 0;
+		assert empty.getItem(0).getItemName() == null;
+
+		Inventory.State unresolved = Inventory.getState(client(container(
+			new Item[]{new Item(999, 1)}, 1)));
+		assert unresolved.getItem(0).getItemId() == 999;
+		assert unresolved.getItem(0).getItemName() == null;
 
 		items[0] = new Item(300, 99);
 		assert state.getItem(0).getItemId() == 100;
@@ -55,7 +70,7 @@ public final class InventorySelfTest
 	{
 		try
 		{
-			slots.add(new ItemSlot(1, 1));
+			slots.add(new ItemSlot(0, 1, "Item 1", 1));
 			assert false;
 		}
 		catch (UnsupportedOperationException expected)
@@ -67,9 +82,24 @@ public final class InventorySelfTest
 	private static Client client(ItemContainer inventory)
 	{
 		return proxy(Client.class, (method, args) ->
-			"getItemContainer".equals(method) && (int) args[0] == InventoryID.INV
-				? inventory
-				: null);
+		{
+			switch (method)
+			{
+				case "getItemContainer":
+					return (int) args[0] == InventoryID.INV ? inventory : null;
+				case "getItemDefinition":
+					int itemId = (int) args[0];
+					return itemId == 999 ? null : itemDefinition(itemId);
+				default:
+					return null;
+			}
+		});
+	}
+
+	private static ItemComposition itemDefinition(int itemId)
+	{
+		return proxy(ItemComposition.class, (method, args) ->
+			"getName".equals(method) ? "Item " + itemId : null);
 	}
 
 	private static ItemContainer container(Item[] items, int filledSlots)

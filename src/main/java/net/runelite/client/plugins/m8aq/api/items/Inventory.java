@@ -36,9 +36,11 @@ public final class Inventory
 		}
 
 		List<ItemSlot> slots = new ArrayList<>();
-		for (Item item : container.getItems())
+		Item[] items = container.getItems();
+		for (int slot = 0; slot < items.length; slot++)
 		{
-			slots.add(new ItemSlot(item.getId(), item.getQuantity()));
+			Item item = items[slot];
+			slots.add(new ItemSlot(slot, item.getId(), ItemNames.get(client, item.getId()), item.getQuantity()));
 		}
 		return new State(true, Collections.unmodifiableList(slots), CAPACITY - container.count());
 	}

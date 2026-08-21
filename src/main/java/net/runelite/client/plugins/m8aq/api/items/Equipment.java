@@ -41,8 +41,8 @@ public final class Equipment
 			int index = slot.getSlotIdx();
 			Item item = index < items.length ? items[index] : null;
 			slots.put(slot, item == null
-				? new ItemSlot(-1, 0)
-				: new ItemSlot(item.getId(), item.getQuantity()));
+				? new ItemSlot(index, -1, null, 0)
+				: new ItemSlot(index, item.getId(), ItemNames.get(client, item.getId()), item.getQuantity()));
 		}
 		return new State(true, Collections.unmodifiableMap(slots));
 	}

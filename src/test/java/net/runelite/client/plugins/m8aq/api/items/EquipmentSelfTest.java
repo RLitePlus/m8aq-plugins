@@ -5,6 +5,7 @@ import java.util.Map;
 import net.runelite.api.Client;
 import net.runelite.api.EquipmentInventorySlot;
 import net.runelite.api.Item;
+import net.runelite.api.ItemComposition;
 import net.runelite.api.ItemContainer;
 import net.runelite.api.gameval.InventoryID;
 
@@ -34,8 +35,15 @@ public final class EquipmentSelfTest
 			assert state.getSlots().containsKey(slot);
 		}
 		assert state.getWeapon().getItemId() == 100;
+		assert state.getWeapon().getSlot() == EquipmentInventorySlot.WEAPON.getSlotIdx();
+		assert state.getWeapon().getItemName().equals("Item 100");
 		assert state.getShield().getItemId() == 200;
+		assert state.getShield().getSlot() == EquipmentInventorySlot.SHIELD.getSlotIdx();
+		assert state.getShield().getItemName().equals("Item 200");
 		assert state.getItem(EquipmentInventorySlot.HEAD).getItemId() == -1;
+		assert state.getItem(EquipmentInventorySlot.HEAD).getSlot()
+			== EquipmentInventorySlot.HEAD.getSlotIdx();
+		assert state.getItem(EquipmentInventorySlot.HEAD).getItemName() == null;
 		assert state.getItem(null) == null;
 		assert state.isEquipped(100);
 		assert !state.isEquipped(300);
@@ -52,7 +60,7 @@ public final class EquipmentSelfTest
 	{
 		try
 		{
-			slots.put(EquipmentInventorySlot.HEAD, new ItemSlot(1, 1));
+			slots.put(EquipmentInventorySlot.HEAD, new ItemSlot(0, 1, "Item 1", 1));
 			assert false;
 		}
 		catch (UnsupportedOperationException expected)
@@ -64,9 +72,23 @@ public final class EquipmentSelfTest
 	private static Client client(ItemContainer equipment)
 	{
 		return proxy(Client.class, (method, args) ->
-			"getItemContainer".equals(method) && (int) args[0] == InventoryID.WORN
-				? equipment
-				: null);
+		{
+			switch (method)
+			{
+				case "getItemContainer":
+					return (int) args[0] == InventoryID.WORN ? equipment : null;
+				case "getItemDefinition":
+					return itemDefinition((int) args[0]);
+				default:
+					return null;
+			}
+		});
+	}
+
+	private static ItemComposition itemDefinition(int itemId)
+	{
+		return proxy(ItemComposition.class, (method, args) ->
+			"getName".equals(method) ? "Item " + itemId : null);
 	}
 
 	private static ItemContainer container(Item[] items)
