@@ -39,7 +39,8 @@ public final class StateReaderSelfTest
 		assert names.equals(Arrays.asList(
 			"canCollect", "getBroken", "getCount", "getNested", "isReady", "needsCooling"));
 		assert values.get("getCount").equals("28");
-		assert values.get("getNested").equals("{\"entry\":{\"value\":7,\"name\":null}}");
+		assert values.get("getNested").equals(
+			"{\"entry\":{\"value\":7,\"name\":null,\"label\":\"V's <shield> & gear = safe\"}}");
 		assert values.get("getBroken").equals("<IllegalStateException: broken>");
 
 		SwingUtilities.invokeAndWait(() ->
@@ -127,11 +128,13 @@ public final class StateReaderSelfTest
 	{
 		private final int value;
 		private final String name;
+		private final String label;
 
 		private FakeValue(int value)
 		{
 			this.value = value;
 			this.name = null;
+			this.label = "V's <shield> & gear = safe";
 		}
 	}
 }

@@ -13,7 +13,7 @@ import net.runelite.api.Client;
 
 final class StateReader
 {
-	private static final Gson GSON = new GsonBuilder().serializeNulls().create();
+	private static final Gson GSON = new GsonBuilder().serializeNulls().disableHtmlEscaping().create();
 
 	private StateReader()
 	{
