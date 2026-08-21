@@ -27,7 +27,10 @@ public final class StateReaderSelfTest
 		assert discovered.containsAll(Arrays.asList(Anvil.class, BlastFurnace.class, Furnace.class));
 		for (int index = 1; index < discovered.size(); index++)
 		{
-			assert discovered.get(index - 1).getName().compareTo(discovered.get(index).getName()) < 0;
+			Class<?> previous = discovered.get(index - 1);
+			Class<?> current = discovered.get(index);
+			int visibleOrder = previous.getSimpleName().compareTo(current.getSimpleName());
+			assert visibleOrder < 0 || visibleOrder == 0 && previous.getName().compareTo(current.getName()) < 0;
 		}
 		for (Class<?> apiClass : discovered)
 		{

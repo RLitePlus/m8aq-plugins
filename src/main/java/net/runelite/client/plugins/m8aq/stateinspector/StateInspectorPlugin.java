@@ -56,7 +56,7 @@ public final class StateInspectorPlugin extends Plugin
 				.stream()
 				.map(ClassPath.ClassInfo::load)
 				.filter(StateInspectorPlugin::isApiClass)
-				.sorted(Comparator.comparing(Class::getName))
+				.sorted(Comparator.comparing((Class<?> type) -> type.getSimpleName()).thenComparing(Class::getName))
 				.collect(Collectors.toUnmodifiableList());
 		}
 		catch (IOException ex)
